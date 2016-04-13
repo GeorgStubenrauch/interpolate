@@ -245,6 +245,47 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 	})
 
 */
+	// Load all the stations and show them
+	
+	$http.get('partials/controllers/getMeasurements.php?USER=dummy').success(function(data, status) {
+        /*var measuredMarkers = [];
+		data.features.forEach(function (feature) {
+				// Define markers from coordinates
+				measuredMarkers.push({
+					layer: 'Temperaturen',
+					lat: eval(feature.geometry.coordinates[0]),
+					lng: eval(feature.geometry.coordinates[1]),
+					temp: feature.properties.temp,
+					icon: awesomeMarkerDefault
+				});
+			});
+			
+		
+			// Tell AngularJS to use myMarkers for the markers 
+			//$scope.markers = myMarkers;	
+
+		//$rootScope.editItems.addLayer(layer);
+		$rootScope.editItems.addLayer(measuredMarkers);*/
+		
+		data.features.forEach(function (feature) {
+			var marker = L.marker({
+				layer: 'Temperaturen',
+				lat: eval(feature.geometry.coordinates[0]),
+				lng: eval(feature.geometry.coordinates[1]),
+				temp: feature.properties.temp,
+				icon: awesomeMarkerDefault
+			});
+			console.log(feature.properties.temp);
+			marker.on("click", function (e) {
+				
+					$rootScope.$broadcast("startedit", {feature: this.layer});
+					
+			});
+			console.log(this);
+			$rootScope.editItems.addLayer(marker);
+		});
+		
+    });
 	
 	$scope.login = function() {
 		console.log("Clicked Login");
