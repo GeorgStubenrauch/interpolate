@@ -1,0 +1,74 @@
+[
+    {
+		"content_type" : "table", 
+		"title" : "Beschreibung", 
+		"headerCells" : {
+						"blank": "",
+						"station": "Stuttgart"
+						},
+		"tableRows" :	{
+						"0": {
+							"cells": {
+								"0": {
+										"id": 0,
+										"title": "Jahresmitteltemperatur",
+										"type": "number",
+										"suffix": " °C",
+										"valid": 8.6,
+										"help": "Du kannst die Jahresmitteltemperatur im Klimadiagramm ablesen. Sie steht in der Kopfzeile unterhalb des Stationsnamens."
+									}
+								}
+							},
+						"1": {
+							"cells": {
+								"0": {
+										"id": 1,
+										"title": "Niedrigste Monatstemperatur",
+										"type": "number",
+										"suffix": " °C",
+										"valid": -0.4,
+										"help": "Du kannst die niedrigste Monatstemperatur im Klimadiagramm ablesen. Verfolge die Temperaturkurve bis zu ihrem niedrigsten Punkt."
+									}
+								}
+							},
+						"2": {
+							"cells": {
+								"0": {
+										"id": 2,
+										"title": "Höchste Monatstemperatur",
+										"type": "number",
+										"suffix": " °C",
+										"valid": 17.7,
+										"help": "Du kannst die niedrigste Monatstemperatur im Klimadiagramm ablesen. Verfolge die Temperaturkurve bis zu ihrem höchsten Punkt."
+									}
+								}	
+							},
+						"3": {
+							"cells": {
+								"0": {
+										"id": 3,
+										"title": "Jahresniederschlag",
+										"type": "number",
+										"suffix": " mm",
+										"valid": 720,
+										"help": "Du kannst die Jahresniederschlagssumme im Klimadiagramm ablesen. Sie steht in der Kopfzeile unterhalb des Stationsnamens."
+									}
+								}	
+							},
+						"4": {
+							"cells": {
+								"0": {
+										"id": 4,
+										"title": "Höhe",
+										"type": "number",
+										"suffix": " m ü. NN",
+										"valid": 371,
+										"help": "Du kannst die Höhe der Station im Klimadiagramm ablesen. Sie steht in der Kopfzeile direkt unterhalb des Stationsnamens."
+									}
+								}
+							}
+						}
+					
+					
+	}
+]

@@ -1,0 +1,3 @@
+{
+  "tableTemplate": "<form name='tableForm' novalidate><table class='table'><thead><tr><th ng-repeat='hcell in content.headerCells'>{{hcell}}</th></tr></thead><tbody><tr ng-repeat='row in content.tableRows'><td ng-repeat='cell in row.cells'>{{cell.title}}{{cell.suffix}}</td><td><input type='{{cell.type}}' name='input{{$index}}' ng-model='value' required validate='cell'  ng-minlength=3 /><div class='error-container' ><small class='danger' ng-show='tableForm.input{{$index}}.required'>Bitte trage einen Wert ein.</small> <small class='error' ng-show='tableForm.input{{$index}}.$error.valid'>Nicht korrekt</small> </div></td></tr></tbody></table></form>"
+}

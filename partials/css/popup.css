@@ -1,0 +1,22 @@
+#background {
+	height:100%;
+	width:100%;
+	border: 1px black solid;
+	float: left;
+	background-color: grey;
+	opacity: 60%;
+
+}
+p {
+	font-family: Verdana;
+	font-size: 30px;
+	text-align:center;
+	padding-top:100px;
+	color:orange;
+}
+span {
+	font-family: Verdana;
+	font-size: 3em;
+	text-align:center;
+	color:red;
+}

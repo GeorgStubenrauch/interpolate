@@ -1,0 +1,15 @@
+{
+  "name": "Leaflet-IconLayers",
+  "homepage": "https://github.com/ScanEx/Leaflet-IconLayers",
+  "version": "0.2.0",
+  "_release": "0.2.0",
+  "_resolution": {
+    "type": "version",
+    "tag": "v0.2.0",
+    "commit": "03653b0cd6fd3c9be8954ebc5cae7067d61ec697"
+  },
+  "_source": "git://github.com/ScanEx/Leaflet-IconLayers.git",
+  "_target": "~0.2.0",
+  "_originalSource": "ScanEx/Leaflet-IconLayers",
+  "_direct": true
+}

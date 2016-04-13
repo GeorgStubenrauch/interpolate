@@ -1,0 +1,383 @@
+.nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
+
+/* Prevent the text contents of draggable elements from being selectable. */
+[draggable] {
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+  /* Required to make elements draggable in old WebKit */
+  -khtml-user-drag: element;
+  -webkit-user-drag: element;
+  cursor: pointer;
+}
+
+.column {
+  width: 80%;
+  float: center;
+  border: 2px solid #666666;
+  background-color: #fff;
+  -webkit-border-radius: 10px;
+  -ms-border-radius: 10px;
+  -moz-border-radius: 10px;
+  border-radius: 10px;
+  -webkit-box-shadow: inset 0 0 3px #000;
+  -ms-box-shadow: inset 0 0 3px #000;
+  box-shadow: inset 0 0 3px #000;
+  text-align: center;
+  cursor: pointer;
+  
+  
+}
+.column header {
+  color: #fff;
+  text-shadow: #000 0 1px;
+  box-shadow: 5px;
+  padding: 5px;
+  background: -moz-linear-gradient(left center, rgb(0,0,0), rgb(79,79,79), rgb(21,21,21));
+  background: -webkit-gradient(linear, left top, right top,
+                               color-stop(0, rgb(0,0,0)),
+                               color-stop(0.50, rgb(79,79,79)),
+                               color-stop(1, rgb(21,21,21)));
+  background: -webkit-linear-gradient(left center, rgb(0,0,0), rgb(79,79,79), rgb(21,21,21));
+  background: -ms-linear-gradient(left center, rgb(0,0,0), rgb(79,79,79), rgb(21,21,21));
+  border-bottom: 1px solid #ddd;
+  -webkit-border-top-left-radius: 10px;
+  -moz-border-radius-topleft: 10px;
+  -ms-border-radius-topleft: 10px;
+  border-top-left-radius: 10px;
+  -webkit-border-top-right-radius: 10px;
+  -ms-border-top-right-radius: 10px;
+  -moz-border-radius-topright: 10px;
+  border-top-right-radius: 10px;
+}
+
+
+.drag {
+	opacity: 0.5;
+	
+}
+
+.drag div {
+	border-color: #0000ff;
+	border-width: 4px;
+	
+}
+
+
+img {
+	max-width:100%;
+
+}
+
+.column.over {
+  border: 2px dashed #000;
+}
+
+
+
+.tasktable  th{
+	background-color: #999;
+	color: white;
+	font-size: 12pt;
+}
+
+
+.vcenter {
+    display: inline-block;
+    vertical-align: middle;
+    float: none;
+}
+
+.header {
+	position:absolute;
+	left:0;
+	top:0;
+	height: 91px;
+	width: 100%;
+	margin-right: 10px;
+	overflow:visible;
+	z-index:2000;
+	vertical-align: middle;
+	pointer-events: none;
+}
+/* Patch */
+
+.leaflet-control-layers-toggle {
+	background-image: url(../../app/data/img/overlays.png);
+	width:80px;
+	height:80px;
+	
+}
+
+
+.interpolateEditPopup {   
+  position: fixed;
+  top: 12%;
+  right: 0px;
+  text-align: center;           
+  width: 370px;
+  height: auto;
+  padding: 2px;             
+  font: 12px sans-serif;        
+  background: white;   
+  z-index:30000;  
+  border:  1px;
+  border-color: black; 
+}
+
+
+ 
+.climateChartDescriptionPopup {   
+  position: fixed;
+  top: 12%;
+  right: 0px;
+  text-align: center;           
+  width: 370px;
+  height: auto;
+  padding: 2px;             
+  font: 12px sans-serif;        
+  background: white;   
+  z-index:30000;  
+  visibility: hidden;   
+  border:  1px;
+  border-color: black; 
+}
+
+.form-group .control-label {
+	
+	font-weight: bold !important;
+	font-size: 11pt !important;
+	color: #337AB7 !important;
+	
+}
+
+
+
+
+.climateChartComparisonPopup {   
+  position: fixed;
+  top: 12%;
+  left: 50%;
+  /* bring your own prefixes */
+  transform: translate(-50%, 0%);
+  text-align: center;           
+  width: 900px; 
+  max-height: 750px;  
+  padding: 2px;             
+  font: 12px sans-serif;        
+  background: white;   
+  z-index:30000;  
+  border:  1px;
+}
+
+
+.climateChartInfoPopup {   
+	position: fixed;
+	bottom: 12%;
+	right: 0px;
+	text-align: justify;           
+	max-width: 250px;
+	height: auto;
+	padding: 10px;             
+	font: 12px sans-serif;        
+	background: white;   
+	z-index:30000;  
+	border: 2px solid #ffffff;
+	-webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
+	border-radius: 10px;
+}
+
+
+.climateChartInfoPopup:after {
+	content: '';
+	position: absolute;
+	border-style: solid;
+	border-width: 15px 15px 0;
+	border-color: #fff transparent;
+	display: block;
+	width: 0;
+	z-index: 1;
+	bottom: -15px;
+	left: 35px;
+}
+
+.climateChartMChoicePopup {   
+	position: fixed;
+	top: 12%;
+	left: 50%;
+	/* bring your own prefixes */
+	transform: translate(-50%, 0%);
+	text-align: center;           
+	width: 400px; 
+	max-height: 750px;  
+	padding: 2px;             
+	font: 12px sans-serif;        
+	background: white;   
+	z-index:30000;  
+	border:  1px;
+}
+
+
+
+
+.animate-if {
+  
+ }
+
+.animate-if.ng-enter, .animate-if.ng-leave {
+  transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 2s;
+}
+
+.animate-if.ng-enter,
+.animate-if.ng-leave.ng-leave-active {
+  opacity:0;
+}
+
+.animate-if.ng-leave,
+.animate-if.ng-enter.ng-enter-active {
+  opacity:1;
+}
+
+
+
+
+
+
+.climateChartThumb {
+	position: absolute;
+	display: flex;
+	flex-flow: row nowrap;
+	align-items: flex-end;
+	bottom: 2px;
+	left: 0px;
+	width: 100%;
+	height: auto;
+	z-index:1; 
+	border: 1px;      
+	visibility: visible;
+	pointer-events: none;
+	}
+	
+.climateChartThumb div {
+	height: auto;
+	pointer-events: auto;
+	
+	
+	}
+	
+
+
+	
+	
+	
+
+.climateChartStationTitle {
+	font-weight: bold;
+	cursor: pointer;
+}
+
+	
+div.tooltip {   
+  position: absolute;           
+  text-align: center;           
+  width: 80px;                  
+  height: 100px;                 
+  padding: 2px;             
+  font: 12px sans-serif;        
+  background: #333333; 
+  color: white;  
+  border: 0px;      
+  border-radius: 8px;           
+  pointer-events: none; 
+  z-index: 5000;  
+}
+
+
+
+
+
+/* Test horizontal */
+.content {
+    width:455px;
+    height:330px;
+    margin-right: 5px;
+    margin-left: 0px;
+	margin-bottom: 0px;
+}
+.panel-group {
+    width:auto;
+	max-width:330px;
+    -webkit-backface-visibility: hidden;
+    -webkit-transform: translateX(-100%) rotate(-90deg);
+    -webkit-transform-origin: right top;
+    -moz-transform: translateX(-100%) rotate(-90deg);
+    -moz-transform-origin: right top;
+    -o-transform: translateX(-100%) rotate(-90deg);
+    -o-transform-origin: right top;
+    transform: translateX(-100%) rotate(-90deg);
+    transform-origin: right top;
+}
+.panel-heading {
+    width: auto;
+	max-width:330px;
+}
+.panel-title {
+    height:18px;
+}
+.panel-title a {
+    float:right;
+    text-decoration:none;
+    padding: 10px 320px;
+    margin: -10px -320px;
+}
+.panel-body-chart {
+    height:360px;
+	width: 330px;
+	
+}
+.panel-body-table {
+	height:200px;
+	width: 330px;
+	pointer-events: none; 
+		
+}
+.panel-group .panel .panel-body-chart svg {
+    -webkit-backface-visibility: hidden;
+    -webkit-transform: rotate(90deg) translateX(100%) translateY(10px);
+    -webkit-transform-origin: right top;
+    -moz-transform: rotate(90deg) translateX(100%) translateY(10px);
+    -moz-transform-origin: right top;
+    -o-transform: rotate(90deg) translateX(100%) translateY(10px);
+    -o-transform-origin: right top;
+    transform: rotate(90deg) translateX(100%) translateY(10px);
+    transform-origin: right top;
+}
+
+
+.panel-group .panel .panel-body-table svg {
+    -webkit-backface-visibility: hidden;
+    -webkit-transform: rotate(90deg) translateX(100%) translateY(-120px);
+    -webkit-transform-origin: right top;
+    -moz-transform: rotate(90deg) translateX(100%) translateY(-120px);
+    -moz-transform-origin: right top;
+    -o-transform: rotate(90deg) translateX(100%) translateY(-120px);
+    -o-transform-origin: right top;
+    transform: rotate(90deg) translateX(100%) translateY(-120px);
+    transform-origin: right top;
+}
+
+// Rules for sizing the icon.
+.material-icons.md-18 { font-size: 18px; }
+.material-icons.md-24 { font-size: 24px; }
+.material-icons.md-36 { font-size: 36px; }
+.material-icons.md-48 { font-size: 48px; }
+
+// Rules for using icons as black on a light background.
+.material-icons.md-dark { color: rgba(0, 0, 0, 0.54); }
+.material-icons.md-dark.md-inactive { color: rgba(0, 0, 0, 0.26); }
+
+// Rules for using icons as white on a dark background.
+.material-icons.md-light { color: rgba(255, 255, 255, 1); }
+.material-icons.md-light.md-inactive { color: rgba(255, 255, 255, 0.3); }
