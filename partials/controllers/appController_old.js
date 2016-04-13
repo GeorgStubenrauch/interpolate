@@ -96,7 +96,7 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 			
 			map.on('draw:created', function (e) {
 				var layer = e.layer;		
-				console.log(layer);
+				
 				$rootScope.editItems.addLayer(layer);
 				
 				$rootScope.heat.addLatLng(layer._latlng);
@@ -242,54 +242,31 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 	//Create an array to store id of markers that is used to control the display of the markers with the timout function:
 	$rootScope.markers = [];
 	
-	//Definition of a global function, this way it can be called inside the interpolate-module
-	$rootScope.displayMarkers = function() {
+	// Load all the existing entries from the database and display them:
+	$http.get('partials/controllers/getMeasurements.php?USER=dummy').success(function(data, status) {
 		
-		
-		// Load all the existing entries from the database, check if marker is already display, if not then display it:
-		$http.get('partials/controllers/getMeasurements.php?USER=dummy').success(function(data, status) {
-		
-			//Iteration through returned entries:
-			data.features.forEach(function (feature) {
+		data.features.forEach(function (feature) {
+			var marker = L.marker({
+				layer: 'draw',
+				lat: eval(feature.geometry.coordinates[0]),
+				lng: eval(feature.geometry.coordinates[1]),
+				temp: feature.properties.temp,
+				id: feature.properties.id,
+				icon: awesomeMarkerDefault
+			});
+			marker.on("click", function (e) {
 				
-				//Check if marker ID is already in the array of the displayed markers:
-				var checkID = $rootScope.markers.indexOf(feature.properties.id);
-				
-				//If marker is not displayed yet, create new marker and display it:
-				if (checkID == -1) {
-					var marker = L.marker({
-						layer: 'Temperaturen',
-						lat: eval(feature.geometry.coordinates[0]),
-						lng: eval(feature.geometry.coordinates[1]),
-						temp: feature.properties.temp,
-						id: feature.properties.id,
-						icon: awesomeMarkerDefault
-					});
-					marker.on("click", function (e) {
-				
-						$rootScope.$broadcast("startedit", {feature: e.layer});
-						console.log(e);
-						
-					});
+					$rootScope.$broadcast("startedit", {feature: e.layer});
 					
-					console.log(marker);
-					
-					//Add marker as layer to map:
-					$rootScope.editItems.addLayer(marker);
-			
-					//Add id of marker entry to array:
-					$rootScope.markers.push(feature.properties.id);
-					
-				}
-				
 			});
 			
+			//Add marker as layer to map:
+			$rootScope.editItems.addLayer(marker);
+			
+			//Add id of marker entry to array:
+			$rootScope.markers.push(feature.properties.id);
 		});
-		
-		
-    };	
-	
-	$rootScope.displayMarkers();
+    });
 	
 	$scope.login = function() {
 		console.log("Clicked Login");

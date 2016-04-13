@@ -8,7 +8,7 @@
 	
 	//define SQL statement for query:
 	//$sql = "SELECT lat, lon, temp FROM 'measurements' WHERE lon BETWEEN ".$bbox[0]." AND ".$bbox[2]." AND lat BETWEEN ".$bbox[1]." AND ".$bbox[3];
-	$sql = "SELECT LAT, LON, TEMP FROM 'measurements' WHERE USER = '".$user."'";
+	$sql = "SELECT ID, LAT, LON, TEMP FROM 'measurements' WHERE USER = '".$user."'";
 	
 	//save query results:
 	$result = $db->query($sql);
@@ -20,7 +20,7 @@
 	//save measurements with while-loop -> row by row:
 	while ($row = $result->fetchArray()) {
 		$geometry = array("type"=>"Point", "coordinates"=>[$row['LAT'],$row['LON']]);
-		$properties = array("temp"=>$row['TEMP']);
+		$properties = array("temp"=>$row['TEMP'], "id"=>$row['ID']);
 		$features[] = array("type"=>"Feature","geometry"=>$geometry,"properties"=>$properties);
 	}
 	$featurecollection["features"]=$features;
