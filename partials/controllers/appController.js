@@ -95,7 +95,8 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 			// Handle creation of temperature markers
 			
 			map.on('draw:created', function (e) {
-				var layer = e.layer;		
+				var layer = e.layer;
+				console.log("Draw:Created:");
 				console.log(layer);
 				$rootScope.editItems.addLayer(layer);
 				
@@ -257,12 +258,15 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 				
 				//If marker is not displayed yet, create new marker and display it:
 				if (checkID == -1) {
+					console.log(feature.properties.temp);
 					var marker = L.marker({
-						layer: 'Temperaturen',
+						layer: "draw",
 						lat: eval(feature.geometry.coordinates[0]),
 						lng: eval(feature.geometry.coordinates[1]),
-						temp: feature.properties.temp,
-						id: feature.properties.id,
+						temp: feature.properties.temp.toString(),
+						/*feature: {
+							temp: feature.properties.temp
+						},*/
 						icon: awesomeMarkerDefault
 					});
 					marker.on("click", function (e) {
