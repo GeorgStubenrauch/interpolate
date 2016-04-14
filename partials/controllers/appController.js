@@ -240,6 +240,13 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 	})
 
 */
+
+	//"Simulation" of multiple users: one array with three different usernames, generating a random number between 0 and 2 to randomly "choose" user!
+	$scope.usernames = ["dummy", "steve", "helmfried"];
+	var randomNumber = Math.round(Math.random() * (2 - 0)) + 0;
+	$rootScope.username = $scope.usernames[randomNumber];
+	alert($rootScope.username);
+	
 	//Create an array to store id of markers that is used to control the display of the markers with the timout function:
 	$rootScope.markers = [];
 	
@@ -248,7 +255,7 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 		
 		
 		// Load all the existing entries from the database, check if marker is already display, if not then display it:
-		$http.get('partials/controllers/getMeasurements.php?USER=dummy').success(function(data, status) {
+		$http.get('partials/controllers/getMeasurements.php?USER=' + $rootScope.username).success(function(data, status) {
 		
 			//Iteration through returned entries:
 			data.features.forEach(function (feature) {
@@ -258,29 +265,19 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 				
 				//If marker is not displayed yet, create new marker and display it:
 				if (checkID == -1) {
-					console.log(feature.properties.temp);
-					var marker = L.marker({
-						layer: "draw",
-						lat: eval(feature.geometry.coordinates[0]),
-						lng: eval(feature.geometry.coordinates[1]),
-						temp: feature.properties.temp.toString(),
-						/*feature: {
-							temp: feature.properties.temp
-						},*/
-						icon: awesomeMarkerDefault
-					});
-					marker.on("click", function (e) {
-				
-						$rootScope.$broadcast("startedit", {feature: e.layer});
-						console.log(e);
-						
-					});
+					var marker = L.marker([eval(feature.geometry.coordinates[0]), eval(feature.geometry.coordinates[1])]);
+					marker.temp =  feature.properties.temp.toString();
 					
-					console.log(marker);
+					//Test:
+					marker.id = feature.properties.id;
+
+					marker.on("click", function (e) {
+                        $rootScope.$broadcast("startedit", {feature: marker});	//Marker object is passed as feature since it stores the temperature value!
+                    });
 					
 					//Add marker as layer to map:
 					$rootScope.editItems.addLayer(marker);
-			
+					
 					//Add id of marker entry to array:
 					$rootScope.markers.push(feature.properties.id);
 					

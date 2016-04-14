@@ -5,28 +5,10 @@
 	$lat = $_GET["LAT"];
 	$lon = $_GET["LON"];
 	$temp = $_GET["TEMP"];
-	$exists = $_GET["EXISTS"];
 	//echo "values" .$user.",".$lat.",".$lon.",".$temp;
 	
     //open the database:
-    $db = new SQLite3('interpolation_app.db'); 
-	
-	//Check if measurement already exists, hence, temp only needs to be updated:
-	//$sql = "SELECT ID FROM 'measurements' WHERE USER = '".$user."' AND LAT = ".$lat." AND LON = ".$lon." AND TEMP = ".$temp;
-
-	//save query results:
-	//$result = $db->query($sql);	
-	
-	//Count number of returned rows:
-	/*$rows = 0;
-	
-	while ($row = $result->fetchArray()) {
-		$rows = $rows + 1;
-	}*/
-	
-	//if ($rows == 0) {
-		
-	if ($exists == 'false') {
+    $db = new SQLite3('interpolation_app.db');   
 	
 	//Check if measurement already exists, hence, temp only needs to be updated:
 	$sql = "SELECT ID FROM 'measurements' WHERE USER = '".$user."' AND LAT = ".$lat." AND LON = ".$lon;
@@ -70,13 +52,6 @@
 		echo $id;
 		
 	}
-	} else {
-		echo "in if";
-		//echo "Updating entries";
-		//Update existing entry:
-		$db->exec("UPDATE measurements SET TEMP = ".$temp." WHERE USER = '".$user."' AND LAT = ".$lat." AND LON = ".$lon.";");
-	}
-	//}
     // close the database connection
     $db->close();
   

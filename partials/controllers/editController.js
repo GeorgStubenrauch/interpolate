@@ -19,7 +19,7 @@ app.controller('editCtrl', [ '$scope', '$rootScope', '$http',  function($scope, 
 		$scope.feature.temp = $scope.temp;
 		
 		console.log("Feature", $scope.feature);
-		
+		console.log("Feature", $scope.feature.id);
 		// Lets loop through all the elements that are drawn by now
 		// pick the correct marker and set the temperature
 		
@@ -28,13 +28,33 @@ app.controller('editCtrl', [ '$scope', '$rootScope', '$http',  function($scope, 
 		// Saving _latlng object of $scope object as a new variable:
 		latLong = $scope.feature._latlng;
 		
+		if (typeof $scope.feature.id == "undefined") {
+			//Saving the measurement inside the database by passing the username, coordinates (lat,lon) and the temperature:
+			$http.get('partials/controllers/saveData.php?USER=' + $rootScope.username + '&LAT=' + latLong.lat + '&LON=' + latLong.lng + '&TEMP=' + $scope.temp + '&EXISTS=false').success(function(data,status) {
+				console.log("Returned data");
+				console.log(data);
+				//Add id of marker entry to array:
+				$rootScope.markers.push(parseInt(data));
+				$scope.feature.id = data;
+			});
+			
+		} else {
+			$http.get('partials/controllers/saveData.php?USER=' + $rootScope.username + '&LAT=' + latLong.lat + '&LON=' + latLong.lng + '&TEMP=' + $scope.temp + '&EXISTS=true').success(function(data,status) {
+				//console.log("Returned data");
+				//console.log(data);
+				//Add id of marker entry to array:
+				//$rootScope.markers.push(parseInt(data));
+			});
+			
+		}
 		//Saving the measurement inside the database by passing the username, coordinates (lat,lon) and the temperature:
-		$http.get('partials/controllers/saveData.php?USER=dummy&LAT=' + latLong.lat + '&LON=' + latLong.lng + '&TEMP=' + $scope.temp).success(function(data,status) {
+		/*$http.get('partials/controllers/saveData.php?USER=' + $rootScope.username + '&LAT=' + latLong.lat + '&LON=' + latLong.lng + '&TEMP=' + $scope.temp).success(function(data,status) {
 			console.log("Returned data");
 			console.log(data);
 			//Add id of marker entry to array:
 			$rootScope.markers.push(parseInt(data));
-		});
+		});*/
+		
 		
 	}
 	
