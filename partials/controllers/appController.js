@@ -2,6 +2,9 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
  
 	console.log("appController is OK");
 	$scope.editing = false;
+	$scope.loggingin = false;
+	
+	$rootScope.username = "";
 	
 	angular.extend($scope, {
 		layercontrol: {
@@ -242,10 +245,10 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 */
 
 	//"Simulation" of multiple users: one array with three different usernames, generating a random number between 0 and 2 to randomly "choose" user!
-	$scope.usernames = ["dummy", "steve", "helmfried"];
+	/*$scope.usernames = ["dummy", "steve", "helmfried"];
 	var randomNumber = Math.round(Math.random() * (2 - 0)) + 0;
 	$rootScope.username = $scope.usernames[randomNumber];
-	alert($rootScope.username);
+	alert($rootScope.username);*/
 	
 	//Create an array to store id of markers that is used to control the display of the markers with the timout function:
 	$rootScope.markers = [];
@@ -290,10 +293,11 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 		
     };	
 	
-	$rootScope.displayMarkers();
+	//$rootScope.displayMarkers();
 	
-	$scope.login = function() {
+	$scope.show = function() {
 		console.log("Clicked Login");
+		$rootScope.$broadcast("startlogin");
 	}
 	
 } ]);
