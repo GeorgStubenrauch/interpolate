@@ -25,7 +25,7 @@ app.controller('loginCtrl', [ '$scope', '$rootScope', '$http',  function($scope,
 					}
 					$rootScope.username = $scope.user;
 					$rootScope.displayMarkers();
-					alert("Login was succesful!");
+					alert("Login was successful!");
 				} else {
 					alert("Username does not exists! You need to register!");
 				}

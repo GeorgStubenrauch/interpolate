@@ -126,6 +126,22 @@ img {
   border-color: black; 
 }
 
+.loginPopup {   
+  position: fixed;
+  top: 10%;
+  left: 75%;
+  right: 0px;
+  text-align: center;           
+  width: 370px;
+  height: auto;
+  padding: 2px;             
+  font: 12px sans-serif;        
+  background: white;   
+  z-index:30000;  
+  border:  1px;
+  border-color: black; 
+}
+
 
  
 .climateChartDescriptionPopup {   

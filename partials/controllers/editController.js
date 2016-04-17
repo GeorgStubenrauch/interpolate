@@ -64,7 +64,7 @@ app.controller('editCtrl', [ '$scope', '$rootScope', '$http',  function($scope, 
 	$rootScope.$on("startedit", function (event, data) {
 	
 		$scope.editing = true;
-		$scope.temp = data.feature.temp;
+		$scope.temp = data.feature.temp;	//Maybe changes necessary for multiple users, if changed in another window...
 		$scope.feature = data.feature;
 		
 	});
