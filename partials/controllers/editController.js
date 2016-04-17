@@ -36,6 +36,9 @@ app.controller('editCtrl', [ '$scope', '$rootScope', '$http',  function($scope, 
 				//Add id of marker entry to array:
 				$rootScope.markers.push(parseInt(data));
 				$scope.feature.id = data;
+				
+				//Add marker object to marker array:
+				$rootScope.marker_array.push($scope.feature);
 			});
 			
 		} else {

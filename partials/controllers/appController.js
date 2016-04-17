@@ -6,6 +6,8 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 	
 	$rootScope.username = "";
 	
+	$rootScope.marker_array = [];
+	
 	angular.extend($scope, {
 		layercontrol: {
                     icons: {
@@ -283,6 +285,9 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 					
 					//Add id of marker entry to array:
 					$rootScope.markers.push(feature.properties.id);
+					
+					//Add marker object to marker array:
+					$rootScope.marker_array.push(marker);
 					
 				}
 				
