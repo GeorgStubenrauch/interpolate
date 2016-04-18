@@ -28,10 +28,17 @@ app.controller('loginCtrl', [ '$scope', '$rootScope', '$http',  function($scope,
 					alert("Login was successful!");
 				} else {
 					alert("Username does not exists! You need to register!");
+					$scope.user = $rootScope.username;
 				}
 			});
 		
 		
+	}
+	
+	$scope.switchToRegister = function() {
+		$scope.loggingin = false;
+		$scope.registering = true;
+		$rootScope.$broadcast("startregister");
 	}
 	
 	$rootScope.$on("startlogin", function (event) {

@@ -2,7 +2,9 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
  
 	console.log("appController is OK");
 	$scope.editing = false;
+	
 	$scope.loggingin = false;
+	$scope.registering = false;
 	
 	$rootScope.username = "";
 	
@@ -100,22 +102,26 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 			// Handle creation of temperature markers
 			
 			map.on('draw:created', function (e) {
-				var layer = e.layer;
-				console.log("Draw:Created:");
-				console.log(layer);
-				$rootScope.editItems.addLayer(layer);
+				if ($rootScope.username) {
+					var layer = e.layer;
+					console.log("Draw:Created:");
+					console.log(layer);
+					$rootScope.editItems.addLayer(layer);
 				
-				$rootScope.heat.addLatLng(layer._latlng);
+					$rootScope.heat.addLatLng(layer._latlng);
 				
-				// register click
-				layer.on("click", function (e) {
+					// register click
+					layer.on("click", function (e) {
 				
-					$rootScope.$broadcast("startedit", {feature: layer});
+						$rootScope.$broadcast("startedit", {feature: layer});
 					
-				});
+					});
 				
-				// Show input dialog
-				$rootScope.$broadcast("startedit", {feature: layer});
+					// Show input dialog
+					$rootScope.$broadcast("startedit", {feature: layer});
+				} else {
+					alert("Please login before adding measurements!")
+				}
 				
 				
 			});
