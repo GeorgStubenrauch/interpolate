@@ -9,6 +9,7 @@ app.controller('editCtrl', [ '$scope', '$rootScope', '$http',  function($scope, 
 	
 	$scope.close = function() {
 		$scope.editing = false;
+		$scope.editable = true;
 	}
 	
 	
@@ -17,7 +18,6 @@ app.controller('editCtrl', [ '$scope', '$rootScope', '$http',  function($scope, 
 		only values between -30 and +45 are allowed, moreover it is checked if the entered value can be converted to a float value, hence does not contain characters!*/
 		if ($scope.temp >= -30 && $scope.temp <= 45 && isNaN(parseFloat($scope.temp)) == false) {
 			$scope.editing = false;
-		
 		
 		
 			// Save the temperature within the feature
@@ -38,6 +38,7 @@ app.controller('editCtrl', [ '$scope', '$rootScope', '$http',  function($scope, 
 				$http.get('partials/controllers/saveData.php?USER=' + $rootScope.username + '&LAT=' + latLong.lat + '&LON=' + latLong.lng + '&TEMP=' + $scope.temp + '&EXISTS=false&ID=-1').success(function(data,status) {
 					console.log("Returned data");
 					console.log(data);
+					
 					//Add id of marker entry to array:
 					$rootScope.markers.push(parseInt(data));
 					$scope.feature.id = data;
@@ -56,7 +57,7 @@ app.controller('editCtrl', [ '$scope', '$rootScope', '$http',  function($scope, 
 			
 			}
 		} else {
-			alert("Please enter values between -35°C and 45°C!")
+			alert("Please enter values between -30°C and 45°C!");
 			$scope.temp = 20;
 		}	
 	}
@@ -89,15 +90,21 @@ app.controller('editCtrl', [ '$scope', '$rootScope', '$http',  function($scope, 
 	$rootScope.$on("startedit", function (event, data) {
 	
 		$scope.editing = true;
-		$scope.temp = data.feature.temp;	//Maybe changes necessary for multiple users, if changed in another window...
+		$scope.temp = data.feature.temp;
 		$scope.feature = data.feature;
+		console.log(data.feature.user);
+		if (typeof data.feature.user != "undefined") {
+			if (data.feature.user != $rootScope.username) {
+				$scope.editable = false;
+			}
+		}
 		
 	});
 	
 	$rootScope.$on("stopedit", function (event, data) {
 	
 		$scope.editing = false;
-		
+		$scope.editable = true;
 	});
 	
 	

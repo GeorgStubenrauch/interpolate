@@ -2,6 +2,7 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
  
 	console.log("appController is OK");
 	$scope.editing = false;
+	$scope.editable = true;
 	
 	$scope.loggingin = false;
 	$scope.registering = false;
@@ -267,6 +268,9 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 		
 		// Load all the existing entries from the database, check if marker is already display, if not then display it:
 		$http.get('partials/controllers/getMeasurements.php?USER=' + $rootScope.username).success(function(data, status) {
+			
+			//Array to store ids of returned markers, used to check if already displayed markers have been deleted in the meantime:
+			var array_marker_ids = [];
 		
 			//Iteration through returned entries:
 			data.features.forEach(function (feature) {
@@ -279,8 +283,11 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 					var marker = L.marker([eval(feature.geometry.coordinates[0]), eval(feature.geometry.coordinates[1])]);
 					marker.temp =  feature.properties.temp.toString();
 					
-					//Test:
+					//Adding the id of the corresponding entry in the table "measurements" of the sqlite database:
 					marker.id = feature.properties.id;
+					
+					//Adding the name of the user that inserted this entry into the table "measurements" of the sqlite database:
+					marker.user = feature.properties.user;
 
 					marker.on("click", function (e) {
                         $rootScope.$broadcast("startedit", {feature: marker});	//Marker object is passed as feature since it stores the temperature value!
@@ -289,15 +296,46 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 					//Add marker as layer to map:
 					$rootScope.editItems.addLayer(marker);
 					
-					//Add id of marker entry to array:
+					//Add id of marker entry to array of displayed markers:
 					$rootScope.markers.push(feature.properties.id);
 					
 					//Add marker object to marker array:
 					$rootScope.marker_array.push(marker);
 					
 				}
+				// if marker is already displayed, check if necessary to update the value:
+				else {
+					$rootScope.marker_array.forEach(function(marker_object) {
+		
+						if (marker_object.id == feature.properties.id) {
+								if (marker_object.temp != feature.properties.temp) {
+									marker_object.temp = feature.properties.temp.toString();
+								}
+						}
+						 
+						
+					});
+				}
+				
+				//Add id of returned marker object to array:
+				array_marker_ids.push(feature.properties.id.toString());
+				console.log(feature.properties.id);
 				
 			});
+			
+			//Check if displayed marker has been deleted in the meantime:
+			$rootScope.marker_array.forEach(function(marker_object) {
+		
+				var index_marker = array_marker_ids.indexOf(marker_object.id.toString());
+				if (index_marker == -1) {
+					$rootScope.editItems.removeLayer(marker_object);
+					var index_this_marker = $rootScope.markers.indexOf(marker_object.id);
+					$rootScope.markers.splice(index_this_marker, 1);
+				}
+						
+			});
+			
+			
 			
 		});
 		

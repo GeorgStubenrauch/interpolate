@@ -79,8 +79,8 @@
 							<div class="input-group-addon">°C</div>	
 						</div>
 			</div>
-			<div class="btn btn-primary" ng-click="save()">Save</button></div>
-			<div class="btn btn-secondary"  ng-click="deleteMarker()">Delete</button></div>
+			<div class="btn btn-primary" ng-show="editable" ng-click="save()">Save</button></div>
+			<div class="btn btn-secondary" ng-show="editable" ng-click="deleteMarker()">Delete</button></div>
 			<div class="modal-footer"></div>
 		</div>
 	</div>
