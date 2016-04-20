@@ -266,7 +266,7 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 	$rootScope.displayMarkers = function() {
 		
 		
-		// Load all the existing entries from the database, check if marker is already display, if not then display it:
+		// Load all the existing entries from the database, check if marker is already displayed, if not then display it:
 		$http.get('partials/controllers/getMeasurements.php?USER=' + $rootScope.username).success(function(data, status) {
 			
 			//Array to store ids of returned markers, used to check if already displayed markers have been deleted in the meantime:

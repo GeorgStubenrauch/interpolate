@@ -32,7 +32,8 @@ app.controller('editCtrl', [ '$scope', '$rootScope', '$http',  function($scope, 
 		
 			// Saving _latlng object of $scope object as a new variable:
 			latLong = $scope.feature._latlng;
-		
+			
+			//Newly created markers that are not yet stored inside the database -> INSERT INTO
 			if (typeof $scope.feature.id == "undefined") {
 				//Saving the measurement inside the database by passing the username, coordinates (lat,lon) and the temperature:
 				$http.get('partials/controllers/saveData.php?USER=' + $rootScope.username + '&LAT=' + latLong.lat + '&LON=' + latLong.lng + '&TEMP=' + $scope.temp + '&EXISTS=false&ID=-1').success(function(data,status) {
@@ -46,7 +47,7 @@ app.controller('editCtrl', [ '$scope', '$rootScope', '$http',  function($scope, 
 					//Add marker object to marker array:
 					$rootScope.marker_array.push($scope.feature);
 				});
-			
+			//Existing markers that are already stored inside the database -> UPDATE
 			} else {
 				$http.get('partials/controllers/saveData.php?USER=' + $rootScope.username + '&LAT=' + latLong.lat + '&LON=' + latLong.lng + '&TEMP=' + $scope.temp + '&EXISTS=true&ID=' + $scope.feature.id ).success(function(data,status) {
 					//console.log("Returned data");
