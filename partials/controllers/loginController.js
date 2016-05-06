@@ -7,11 +7,14 @@ app.controller('loginCtrl', [ '$scope', '$rootScope', '$http',  function($scope,
 	}
 	
 	$scope.login = function() {
-		$scope.loggingin = false;
+		
 	
 		console.log($scope.user);
 		
-		$http.get('partials/controllers/login.php?USER=' + $scope.user).success(function(data,status) {
+		if (typeof $scope.user != 'undefined') {
+			$scope.loggingin = false;
+			
+			$http.get('partials/controllers/login.php?USER=' + $scope.user).success(function(data,status) {
 				console.log("Returned data");
 				console.log(data);
 				if (data == "true") {
@@ -31,7 +34,10 @@ app.controller('loginCtrl', [ '$scope', '$rootScope', '$http',  function($scope,
 					$scope.user = $rootScope.username;
 				}
 			});
-		
+		} else {
+			alert("Please enter a username before logging in!");
+			$scope.loggingin = true;
+		}
 		
 	}
 	

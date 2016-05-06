@@ -7,11 +7,13 @@ app.controller('registerCtrl', [ '$scope', '$rootScope', '$http',  function($sco
 	}
 	
 	$scope.register = function() {
-		$scope.registering = false;
+		
 	
 		console.log($scope.user);
 		
-		$http.get('partials/controllers/register.php?USER=' + $scope.user).success(function(data,status) {
+		if (typeof $scope.user != 'undefined') {
+			$scope.registering = false;
+			$http.get('partials/controllers/register.php?USER=' + $scope.user).success(function(data,status) {
 				console.log("Returned data");
 				console.log(data);
 				if (data == "true") {
@@ -23,6 +25,12 @@ app.controller('registerCtrl', [ '$scope', '$rootScope', '$http',  function($sco
 					$scope.user = "";
 				}
 			});
+			
+		} else {
+			alert("Please enter a username before trying to register!");
+			$scope.registering = true;
+		}
+		
 		
 		
 	}
