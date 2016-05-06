@@ -29,7 +29,15 @@ app.controller('editCtrl', [ '$scope', '$rootScope', '$http',  function($scope, 
 			// pick the correct marker and set the temperature
 		
 			$rootScope.editItems._layers[$scope.feature._leaflet_id].temp = $scope.temp;
-		
+			
+			//Update value of marker icon:
+			/*$rootScope.editItems._layers[$scope.feature._leaflet_id].setIcon(L.ExtraMarkers.icon({
+									icon: 'fa-number',
+									number: parseInt($scope.temp),
+									markerColor: 'blue'}));*/
+			var thisIcon = $rootScope.getMarkerIcon($scope.temp, "default");
+			$rootScope.editItems._layers[$scope.feature._leaflet_id].setIcon(thisIcon);
+			
 			// Saving _latlng object of $scope object as a new variable:
 			latLong = $scope.feature._latlng;
 			
@@ -41,11 +49,15 @@ app.controller('editCtrl', [ '$scope', '$rootScope', '$http',  function($scope, 
 					console.log(data);
 					
 					//Add id of marker entry to array:
-					$rootScope.markers.push(parseInt(data));
-					$scope.feature.id = data;
+					//$rootScope.markers.push(parseInt(data));
+					//$scope.feature.id = data;
+					$scope.feature.id = parseInt(data);
+					$rootScope.markers.push($scope.feature.id);
+					//$scope.arrayID.push($scope.feature.id);
 				
 					//Add marker object to marker array:
 					$rootScope.marker_array.push($scope.feature);
+					//$scope.arrayMarker.push($scope.feature);
 				});
 			//Existing markers that are already stored inside the database -> UPDATE
 			} else {
@@ -68,23 +80,31 @@ app.controller('editCtrl', [ '$scope', '$rootScope', '$http',  function($scope, 
 		$scope.editing = false;
 		//Temperature not yet saved to database:
 		if (typeof $scope.feature.id == "undefined") {
+			console.log("in undefined");
 			//Remove marker object from layer
 			$rootScope.editItems.removeLayer($scope.feature);
 		//Entry already added to database:
 		} else {
 			//Remove marker object from map:
 			$rootScope.marker_array.forEach(function(marker) {
-				if ($scope.feature.id == marker.id) {
+				if (parseInt($scope.feature.id) == parseInt(marker.id)) {
+					console.log("in IF!");
 					$rootScope.editItems.removeLayer(marker);
+					
+					//Remove id from array used to controll addition of markers:
+					var id_index = $rootScope.markers.indexOf($scope.feature.id);
+					if (id_index > -1) {
+						//console.log($rootScope.markers);
+						//console.log(id_index);
+						$rootScope.markers.splice(id_index, 1);
+						//console.log($rootScope.markers);
+						var marker_index = $rootScope.marker_array.indexOf(marker);
+						$rootScope.marker_array.splice(marker_index,1);
+					}
+					//Remove entry from database:
+					$http.get('partials/controllers/deleteData.php?ID=' + $scope.feature.id).success(function(data,status) {});
 				}	
 			});
-			//Remove id from array used to controll addition of markers:
-			var id_index = $rootScope.markers.indexOf($scope.feature.id);
-			if (id_index > -1) {
-				$rootScope.markers.splice(id_index, 1);
-			}
-			//Remove entry from database:
-			$http.get('partials/controllers/deleteData.php?ID=' + $scope.feature.id).success(function(data,status) {});
 		}
 	}
 	

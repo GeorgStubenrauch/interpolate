@@ -3,6 +3,7 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 	console.log("appController is OK");
 	$scope.editing = false;
 	$scope.editable = true;
+	$scope.display_markers = false;
 	
 	$scope.loggingin = false;
 	$scope.registering = false;
@@ -11,6 +12,59 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 	
 	$rootScope.marker_array = [];
 	
+	var awesomeMarkerIconDefault = L.ExtraMarkers.icon({
+					icon: 'fa-number',
+					markerColor: 'blue'
+	});
+	
+	var awesomeMarkerIconUpdated =  L.ExtraMarkers.icon({
+					icon: 'fa-number',
+					markerColor: 'green'
+	});
+	
+	var awesomeMarkerIconOtherUser =  L.ExtraMarkers.icon({
+					icon: 'fa-number',
+					markerColor: 'red'
+	});
+				
+	var awesomeMarkerUpdate = L.ExtraMarkers.icon({
+					icon: 'fa-spinner',
+					shape: 'circle',
+					markerColor: 'green',
+					prefix: 'fa',
+					extraClasses: 'fa-spin'
+	});
+	
+	//Create marker icon depending on type needed and temperature:
+	$rootScope.getMarkerIcon = function(temp,type) {
+		switch(type) {
+			case "default": return L.ExtraMarkers.icon({
+									icon: 'fa-number',
+									number: parseInt(temp),
+									markerColor: 'blue'});
+							break;
+							
+			case "otherUser":	return L.ExtraMarkers.icon({
+									icon: 'fa-number',
+									number: parseInt(temp),
+									markerColor: 'red'});
+							break;
+							
+			case "updated":	return L.ExtraMarkers.icon({
+									icon: 'fa-number',
+									number: parseInt(temp),
+									markerColor: 'green'});
+							break;
+							
+			default:	return L.ExtraMarkers.icon({
+									icon: 'fa-number',
+									number: parseInt(temp),
+									markerColor: 'blue'});
+							break;
+		} 
+		
+	}
+				
 	angular.extend($scope, {
 		layercontrol: {
                     icons: {
@@ -59,28 +113,14 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 					rectangle: false,
 					circle: false,
 					marker: {
+						icon: awesomeMarkerIconDefault,
 						repeatMode: true
 					}
 				}
 			}
 		}
 		
-	});
-	
-
-	var awesomeMarkerIcon =  {
-                    type: 'awesomeMarker',
-                    icon: 'tint',
-                    markerColor: 'red'
-                }
-				
-	var awesomeMarkerDefault = {
-			type: 'awesomeMarker',
-			icon: 'tint',
-			markerColor: 'blue'
-	}
-				
-				
+	});		
 		
 	var DefaultIcon = new L.Icon.Default();
 	
@@ -93,7 +133,7 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 		
 		//addressPoints = addressPoints.map(function(p) { return [p[0], p[1]] } );
 		//Heat:	--> multidimensional array needed
-		$rootScope.heat = L.heatLayer([[48.7,8.6]]).addTo(map);
+		//$rootScope.heat = L.heatLayer([[48.7,8.6]]).addTo(map);
 	
 		// Instantiate Draw Plugin
 		leafletData.getLayers().then(function(baselayers) {
@@ -109,12 +149,12 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 					console.log(layer);
 					$rootScope.editItems.addLayer(layer);
 				
-					$rootScope.heat.addLatLng(layer._latlng);
+					//$rootScope.heat.addLatLng(layer._latlng);
 				
 					// register click
 					layer.on("click", function (e) {
 				
-						$rootScope.$broadcast("startedit", {feature: layer});
+						$rootScope.$broadcast("startedit", {feature: layer /*, arrayID: $rootScope.markers, arrayMarker: $rootScope.marker_array*/});
 					
 					});
 				
@@ -252,19 +292,26 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 	})
 
 */
-
-	//"Simulation" of multiple users: one array with three different usernames, generating a random number between 0 and 2 to randomly "choose" user!
-	/*$scope.usernames = ["dummy", "steve", "helmfried"];
-	var randomNumber = Math.round(Math.random() * (2 - 0)) + 0;
-	$rootScope.username = $scope.usernames[randomNumber];
-	alert($rootScope.username);*/
 	
 	//Create an array to store id of markers that is used to control the display of the markers with the timout function:
 	$rootScope.markers = [];
 	
+	//Create an array to store the marker objects that are created / changed by other users:
+	$rootScope.updateMarkers = [];
+	
 	//Definition of a global function, this way it can be called inside the interpolate-module
 	$rootScope.displayMarkers = function() {
 		
+		//console.log($rootScope.markers);
+		//console.log($rootScope.markers.length);
+		
+		//"Reset" previusly updated / created markers -> change icon color to default, done by iterating throuhg array with marker objects:
+		$rootScope.updateMarkers.forEach(function (marker) {
+			thisIcon = $rootScope.getMarkerIcon(marker.temp, "otherUser");
+			marker.setIcon(thisIcon);
+			$rootScope.updateMarkers.splice(marker, 1);
+		});
+		//console.log($rootScope.updateMarkers.length);
 		
 		// Load all the existing entries from the database, check if marker is already displayed, if not then display it:
 		$http.get('partials/controllers/getMeasurements.php?USER=' + $rootScope.username).success(function(data, status) {
@@ -275,29 +322,61 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 			//Iteration through returned entries:
 			data.features.forEach(function (feature) {
 				
+				var thisIcon;
 				//Check if marker ID is already in the array of the displayed markers:
-				var checkID = $rootScope.markers.indexOf(feature.properties.id);
+				//console.log(feature.properties.id);
+				var checkID = $rootScope.markers.indexOf(parseInt(feature.properties.id));
+				//console.log(checkID);
 				
 				//If marker is not displayed yet, create new marker and display it:
 				if (checkID == -1) {
-					var marker = L.marker([eval(feature.geometry.coordinates[0]), eval(feature.geometry.coordinates[1])]);
+					/*check if user just logged in -> display all existing markers, variable used: $scope.display_markers,
+					first login -> display all markers with defaultIcon -> blue,
+					thereafter: -> display new markers added by other clients -> green*/
+					if ($scope.display_markers == false) {
+						if (feature.properties.user == $rootScope.username) {
+							thisIcon = $rootScope.getMarkerIcon(feature.properties.temp, "default");
+							var marker = L.marker([eval(feature.geometry.coordinates[0]), eval(feature.geometry.coordinates[1])], {icon: thisIcon});
+						} else {
+							thisIcon = $rootScope.getMarkerIcon(feature.properties.temp, "otherUser");
+							//var marker = L.marker([eval(feature.geometry.coordinates[0]), eval(feature.geometry.coordinates[1])], {icon: awesomeMarkerIconOtherUser});
+							var marker = L.marker([eval(feature.geometry.coordinates[0]), eval(feature.geometry.coordinates[1])], {icon: thisIcon});
+						}	
+					} else {
+						if (feature.properties.user == $rootScope.username) {
+							thisIcon = $rootScope.getMarkerIcon(feature.properties.temp, "default");
+							var marker = L.marker([eval(feature.geometry.coordinates[0]), eval(feature.geometry.coordinates[1])], {icon: thisIcon});
+						} else {
+							var marker = L.marker([eval(feature.geometry.coordinates[0]), eval(feature.geometry.coordinates[1])], {icon: awesomeMarkerUpdate});
+							marker.options.clickable = false;
+							setTimeout(function() {
+								marker.options.clickable = true;
+								thisIcon = $rootScope.getMarkerIcon(feature.properties.temp, "updated");
+								marker.setIcon(thisIcon);
+							},2000);						
+						}
+						$rootScope.updateMarkers.push(marker);
+					}
+					
 					marker.temp =  feature.properties.temp.toString();
 					
 					//Adding the id of the corresponding entry in the table "measurements" of the sqlite database:
-					marker.id = feature.properties.id;
-					
+					marker.id = parseInt(feature.properties.id);
+					//console.log(marker.id);
 					//Adding the name of the user that inserted this entry into the table "measurements" of the sqlite database:
 					marker.user = feature.properties.user;
 
 					marker.on("click", function (e) {
-                        $rootScope.$broadcast("startedit", {feature: marker});	//Marker object is passed as feature since it stores the temperature value!
+                        $rootScope.$broadcast("startedit", {feature: marker /*, arrayID: $rootScope.markers, arrayMarker: $rootScope.marker_array*/});	//Marker object is passed as feature since it stores the temperature value!
                     });
+					
+					//marker.setIcon(awesomeMarkerIcon);
 					
 					//Add marker as layer to map:
 					$rootScope.editItems.addLayer(marker);
 					
 					//Add id of marker entry to array of displayed markers:
-					$rootScope.markers.push(feature.properties.id);
+					$rootScope.markers.push(parseInt(feature.properties.id));
 					
 					//Add marker object to marker array:
 					$rootScope.marker_array.push(marker);
@@ -307,9 +386,17 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 				else {
 					$rootScope.marker_array.forEach(function(marker_object) {
 		
-						if (marker_object.id == feature.properties.id) {
+						if (parseInt(marker_object.id) == parseInt(feature.properties.id)) {
 								if (marker_object.temp != feature.properties.temp) {
+									marker_object.setIcon(awesomeMarkerUpdate);
+									marker_object.options.clickable = false;
 									marker_object.temp = feature.properties.temp.toString();
+									$rootScope.updateMarkers.push(marker_object);
+									setTimeout(function() {
+										marker_object.options.clickable = true;
+										thisIcon = $rootScope.getMarkerIcon(feature.properties.temp, "updated");
+										marker_object.setIcon(thisIcon);
+									},2000);
 								}
 						}
 						 
@@ -318,24 +405,46 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 				}
 				
 				//Add id of returned marker object to array:
-				array_marker_ids.push(feature.properties.id.toString());
-				console.log(feature.properties.id);
+				array_marker_ids.push(parseInt(feature.properties.id));
+				//console.log(feature.properties.id);
 				
 			});
 			
 			//Check if displayed marker has been deleted in the meantime:
-			$rootScope.marker_array.forEach(function(marker_object) {
-		
-				var index_marker = array_marker_ids.indexOf(marker_object.id.toString());
+			$rootScope.markers.forEach(function(marker_id) {
+				console.log(marker_id);
+				var index_marker = array_marker_ids.indexOf(parseInt(marker_id));
+				console.log(index_marker);
 				if (index_marker == -1) {
+					//console.log("inDeletion-WHY!?");
+					//console.log(marker_object.id);
+					//$rootScope.editItems.removeLayer(marker_object);
+					var index_deleted_marker = $rootScope.markers.indexOf(parseInt(marker_id));
+					$rootScope.markers.splice(index_deleted_marker, 1);
+					$rootScope.marker_array.forEach(function(marker_object) {
+						if (parseInt(marker_object.id) == parseInt(marker_id)) {
+							$rootScope.editItems.removeLayer(marker_object);
+						}
+					});
+				}		
+			});
+			
+			/*$rootScope.marker_array.forEach(function(marker_object) {
+				console.log(marker_object.id);
+				var index_marker = array_marker_ids.indexOf(parseInt(marker_object.id));
+				console.log(index_marker);
+				if (index_marker == -1) {
+					//console.log("inDeletion-WHY!?");
+					//console.log(marker_object.id);
 					$rootScope.editItems.removeLayer(marker_object);
-					var index_this_marker = $rootScope.markers.indexOf(marker_object.id);
+					var index_this_marker = $rootScope.markers.indexOf(parseInt(marker_object.id));
 					$rootScope.markers.splice(index_this_marker, 1);
 				}
 						
-			});
+			});*/
 			
-			
+			//after first use -> set $scope.display_markers to true:
+			$scope.display_markers = true;			
 			
 		});
 		
