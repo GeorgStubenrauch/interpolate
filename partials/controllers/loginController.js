@@ -28,6 +28,11 @@ app.controller('loginCtrl', [ '$scope', '$rootScope', '$http',  function($scope,
 					}
 					$rootScope.username = $scope.user;
 					$rootScope.displayMarkers();
+					
+					//Heatcanvas Test:
+					/*if ($rootScope.measurements.length > 0) {
+						$rootScope.getInterpolation($rootScope.measurements);
+					}*/
 					alert("Login was successful!"); //Error?
 				} else {
 					alert("Username does not exists! You need to register!");

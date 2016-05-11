@@ -4,6 +4,7 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 	$scope.editing = false;
 	$scope.editable = true;
 	$scope.display_markers = false;
+	//$scope.display_heatcanvas = false;
 	
 	$scope.loggingin = false;
 	$scope.registering = false;
@@ -29,7 +30,7 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 				
 	var awesomeMarkerUpdate = L.ExtraMarkers.icon({
 					icon: 'fa-spinner',
-					shape: 'circle',
+					shape: 'penta',
 					markerColor: 'green',
 					prefix: 'fa',
 					extraClasses: 'fa-spin'
@@ -298,6 +299,12 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 	})
 
 */
+	//Create an array to store the measurement data for interpolation:
+	//$rootScope.measurements = [];
+	/*$rootScope.measurements = {
+		max: 45,
+		data: []
+	};*/
 	
 	//Create an array to store id of markers that is used to control the display of the markers with the timout function:
 	$rootScope.markers = [];
@@ -387,6 +394,10 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 					//Add marker object to marker array:
 					$rootScope.marker_array.push(marker);
 					
+					//Adding measurement data for interpolation:
+					//var this_measurement = new Array(eval(feature.geometry.coordinates[0]), eval(feature.geometry.coordinates[1]), parseFloat(feature.properties.temp));
+					//$rootScope.measurements.push(this_measurement);
+					 //$rootScope.measurements.data.push({lat: eval(feature.geometry.coordinates[0]), lng:eval(feature.geometry.coordinates[1]), temp: parseFloat(feature.properties.temp)});
 				}
 				// if marker is already displayed, check if necessary to update the value:
 				else {
@@ -455,13 +466,41 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 		});
 		
 		
-    };	
+    };
+	
+	//Definition of a global function, this way it can be called inside the interpolate-module
+	/*$rootScope.getInterpolation = function(measurements) {
+		if (measurements.length > 0) {
+			for(var i=0,l=measurements.length; i<l; i++) {
+                $rootScope.heatmap.pushData(measurements[i][0], measurements[i][1], measurements[i][2]);
+            }
+		}
+	}
+	
+	//Leaflet.heatcanvas:
+	$rootScope.heatmap = new
+                L.TileLayer.HeatCanvas({},{'step':0.5,
+                'degree':HeatCanvas.LINEAR, 'opacity':0.7});
+				
+	/*if ($rootScope.measurements.length > 0) {
+		!$scope.display_heatcanvas;*/
+	//$rootScope.heatmap.addTo(leafletData.getMap());
+	/*var map = leafletData.getMap();
+	$rootScope.heatmap.addTo(map);*/
+	//}
+				
+    /*heatmap.onRenderingStart(function(){
+		document.getElementById("status").innerHTML = 'rendering';  
+    });
+	
+    heatmap.onRenderingEnd(function(){
+        document.getElementById("status").innerHTML = '';  
+    });*/
 	
 	//$rootScope.displayMarkers();
 	
 	$scope.show = function() {
 		console.log("Clicked Login");
 		$rootScope.$broadcast("startlogin");
-	}
-	
+	}	
 } ]);
