@@ -16,10 +16,14 @@ app.controller('editCtrl', [ '$scope', '$rootScope', '$http',  function($scope, 
 	$scope.save = function() {
 		/*Validation of entered measurements:
 		only values between -30 and +45 are allowed, moreover it is checked if the entered value can be converted to a float value, hence does not contain characters!*/
+		
+		if ($scope.temp.indexOf(",") != -1) {
+			$scope.temp = $scope.temp.replace(",",".");
+		}
 		if ($scope.temp >= -30 && $scope.temp <= 45 && isNaN(parseFloat($scope.temp)) == false) {
 			$scope.editing = false;
 		
-		
+			
 			// Save the temperature within the feature
 			$scope.feature.temp = $scope.temp;
 		

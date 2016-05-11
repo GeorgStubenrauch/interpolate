@@ -35,32 +35,38 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 					extraClasses: 'fa-spin'
 	});
 	
-	//Create marker icon depending on type needed and temperature:
+	/*Create marker icon depending on type needed and temperature,
+	two parameters: the temperature value and the type of the markers:*/
 	$rootScope.getMarkerIcon = function(temp,type) {
 		switch(type) {
+			//default = markers of own group:
 			case "default": return L.ExtraMarkers.icon({
 									icon: 'fa-number',
-									number: parseInt(temp),
+									number: Math.round(parseFloat(temp)),	//conversion to float and then rounding to next integer value
 									markerColor: 'blue'});
 							break;
-							
+			
+			//otherUser = markers of other groups:
 			case "otherUser":	return L.ExtraMarkers.icon({
 									icon: 'fa-number',
-									number: parseInt(temp),
+									shape: 'penta',
+									number: Math.round(parseFloat(temp)),
 									markerColor: 'red'});
 							break;
-							
+			
+			//updated = markers that were updated by other group since last update
 			case "updated":	return L.ExtraMarkers.icon({
 									icon: 'fa-number',
-									number: parseInt(temp),
+									shape: 'penta',
+									number: Math.round(parseFloat(temp)),
 									markerColor: 'green'});
 							break;
 							
 			default:	return L.ExtraMarkers.icon({
 									icon: 'fa-number',
-									number: parseInt(temp),
+									number: Math.round(parseFloat(temp)),
 									markerColor: 'blue'});
-							break;
+						break;
 		} 
 		
 	}
