@@ -13,21 +13,23 @@
 	
     <script src="app/components/angular/angular.min.js"></script>
     <script src="app/components/leaflet/dist/leaflet.js"></script>
-	<!--<script src="app/components/leaflet-0.7.7/leaflet.js"></script>-->
 	<script src="app/components/Leaflet-IconLayers/src/iconLayers.js"></script>
 	<script src="app/components/angular-leaflet-directive/dist/angular-leaflet-directive.min.js"></script>
 	<script src="app/components/sidebar-v2/js/leaflet-sidebar.js"></script>
 	<script src="app/components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
 	<script src="app/components/Leaflet.awesome-markers/dist/leaflet.awesome-markers.js"></script>
 	<script src="app/components/leaflet-draw/dist/leaflet.draw.js"></script>
+	<script src="app/components/Leaflet.heat-gh-pages/src/HeatLayer.js"></script>
 	<script src="app/components/Leaflet.heat-gh-pages/dist/leaflet-heat.js"></script>
 	<script src="app/components/Leaflet.ExtraMarkers/dist/js/leaflet.extra-markers.min.js"></script>
+	<script src="app/components/Canvas_Overlay/L.CanvasOverlay.js"></script>
+	<!--<script src="app/components/kriging/kriging.js"></script>-->
 	
 	<!--Leaflet.heatcanvas inclusive Leaflet 0.7.7-->
-	<!--<script src="app/components/leaflet-0.7.7/leaflet.js"></script>
+	<!--<script src="app/components/leaflet-0.7.7/leaflet.js"></script>-->
 	<script src="app/components/Leaflet.heatcanvas/heatcanvas.js"></script>
 	<script src="app/components/Leaflet.heatcanvas/heatcanvas-leaflet.js"></script>
-	<script src="app/components/Leaflet.heatcanvas/heatcanvas-worker.js"></script>-->
+	<script src="app/components/Leaflet.heatcanvas/heatcanvas-worker.js"></script>
 	<!--Heatmap.js-->
 	<!--<script src="app/components/Leaflet.heatmap/leaflet-heatmap.js"></script>-->
 	
@@ -113,7 +115,7 @@
 						</div>
 			</div>
 			<div class="btn btn-primary"  ng-click="login()">Login</button></div>
-			<div class="btn btn-secondary"  ng-click="switchToRegister()">Register</button></div>
+			<div class="btn btn-secondary" ng-show="teacher" ng-click="switchToRegister()">Register</button></div>
 			<div class="modal-footer"></div>
 		</div>
 	</div>
@@ -128,9 +130,17 @@
 		<div class="modal-body">
 
 			<div class="form-group form-group" >
-						<label class="col-sm-6 control-label">Username:</label>
+						<label class="col-sm-6 control-label">Schule:</label>
 						<div class="input-group col-sm-5">
-							<input type="text" ng-model="user" class="form-control" required>
+							<input type="text" ng-model="part1" class="form-control" required>
+						</div>
+						<label class="col-sm-6 control-label">Klasse:</label>
+						<div class="input-group col-sm-5">
+							<input type="text" ng-model="part2" class="form-control" required>
+						</div>
+						<label class="col-sm-6 control-label">Anzahl:</label>
+						<div class="input-group col-sm-5">
+							<input type="text" ng-model="amount" class="form-control"  required>
 						</div>
 			</div>
 			<div class="btn btn-primary"  ng-click="register()">Register!</button></div>

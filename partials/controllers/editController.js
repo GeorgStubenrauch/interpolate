@@ -35,10 +35,6 @@ app.controller('editCtrl', [ '$scope', '$rootScope', '$http',  function($scope, 
 			$rootScope.editItems._layers[$scope.feature._leaflet_id].temp = $scope.temp;
 			
 			//Update value of marker icon:
-			/*$rootScope.editItems._layers[$scope.feature._leaflet_id].setIcon(L.ExtraMarkers.icon({
-									icon: 'fa-number',
-									number: parseInt($scope.temp),
-									markerColor: 'blue'}));*/
 			var thisIcon = $rootScope.getMarkerIcon($scope.temp, "default");
 			$rootScope.editItems._layers[$scope.feature._leaflet_id].setIcon(thisIcon);
 			
@@ -62,6 +58,21 @@ app.controller('editCtrl', [ '$scope', '$rootScope', '$http',  function($scope, 
 					//Add marker object to marker array:
 					$rootScope.marker_array.push($scope.feature);
 					//$scope.arrayMarker.push($scope.feature);
+					
+					/*Leaflet.Heat:
+					--------Speichern der Werte LAT LONG und TEMP in einem Array-------------------------
+
+					$scope.interarray = [];
+					inttemp = parseInt($scope.temp);
+					$scope.interarray.push(latLong["lat"], latLong["lng"],inttemp);
+
+					console.log("interarray......................................");
+					console.log($scope.interarray);
+
+					arrayTemp.push($scope.interarray);
+					console.log("ArrayTEMP.........................................");
+					console.log(arrayTemp);*/
+					
 				});
 			//Existing markers that are already stored inside the database -> UPDATE
 			} else {

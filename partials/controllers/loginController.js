@@ -17,7 +17,7 @@ app.controller('loginCtrl', [ '$scope', '$rootScope', '$http',  function($scope,
 			$http.get('partials/controllers/login.php?USER=' + $scope.user).success(function(data,status) {
 				console.log("Returned data");
 				console.log(data);
-				if (data == "true") {
+				if (data != "false") {
 					console.log("User " + $scope.user + " exists");
 					if ($rootScope.username != "") {
 						$rootScope.marker_array.forEach(function(marker) {
@@ -27,6 +27,8 @@ app.controller('loginCtrl', [ '$scope', '$rootScope', '$http',  function($scope,
 						$rootScope.markers.length = 0;
 					}
 					$rootScope.username = $scope.user;
+					$rootScope.user_id = data;
+					console.log($rootScope.user_id);
 					$rootScope.displayMarkers();
 					
 					//Heatcanvas Test:
@@ -54,16 +56,21 @@ app.controller('loginCtrl', [ '$scope', '$rootScope', '$http',  function($scope,
 	}
 	
 	$rootScope.$on("startlogin", function (event) {
+		//Check if user is a teacher, only then display the "Register"-Button:
+		if ($rootScope.user_id != 0) {
+			$scope.teacher = true;
+		} else {
+			$scope.teacher = false;
+		}
 	
 		$scope.loggingin = true;
 		console.log("Modal open!");
 		
+		
 	});
 	
 	$rootScope.$on("stoplogin", function (event) {
-	
 		$scope.loggingin = false;
-		
 	});
 	
 	
