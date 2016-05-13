@@ -35,7 +35,7 @@ app.controller('editCtrl', [ '$scope', '$rootScope', '$http',  function($scope, 
 			$rootScope.editItems._layers[$scope.feature._leaflet_id].temp = $scope.temp;
 			
 			//Update value of marker icon:
-			var thisIcon = $rootScope.getMarkerIcon($scope.temp, "default");
+			var thisIcon = $rootScope.getMarkerIcon($scope.temp, "default", $rootScope.getGroupnumber($rootScope.username));
 			$rootScope.editItems._layers[$scope.feature._leaflet_id].setIcon(thisIcon);
 			
 			// Saving _latlng object of $scope object as a new variable:
@@ -130,7 +130,8 @@ app.controller('editCtrl', [ '$scope', '$rootScope', '$http',  function($scope, 
 		$scope.feature = data.feature;
 		console.log(data.feature.user);
 		if (typeof data.feature.user != "undefined") {
-			if (data.feature.user != $rootScope.username) {
+			//Disable editing or deletion feature for other groups if user is not a teacher:
+			if (data.feature.user != $rootScope.username && $rootScope.user_id == 0) {
 				$scope.editable = false;
 			}
 		}

@@ -69,7 +69,9 @@ app.controller('registerCtrl', [ '$scope', '$rootScope', '$http',  function($sco
 	}
 	
 	$rootScope.$on("startregister", function (event) {
-	
+		
+		$scope.part1 = $rootScope.school;
+		$scope.part2 = $rootScope.classname;
 		$scope.registering = true;
 		console.log("Modal open!");
 		
