@@ -12,10 +12,13 @@ app.controller('classCtrl', [ '$scope', '$rootScope', '$http',  function($scope,
 			$scope.gettingclass = false;
 			$rootScope.school = $scope.part1;
 			$rootScope.classname = $scope.part2;
-			$rootScope.username = $rootScope.school + "_" + $rootScope.classname + "_";
+			$rootScope.username = $rootScope.school + "_" + $rootScope.classname + "_" + parseInt(0).toString();
 			
 			//Retrieve potentially existing markers from database:
 			$rootScope.displayMarkers();
+			
+			//Changing the color of the default icon depending on the group (here teacher):
+			$rootScope.awesomeMarkerIconDefault.options.markerColor = $rootScope.color_array[$rootScope.getGroupnumber($rootScope.username)];
 						
 		} else {
 			alert("Please enter a valid school- and classname!");

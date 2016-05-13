@@ -22,14 +22,14 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 	
 	$rootScope.marker_array = [];
 	
-	$rootScope.color_array = ['blue','yellow','red','brown','orange','black','white'];
+	$rootScope.color_array = ['black','blue','yellow','red','brown','cyan','orange','blue-dark','purple','green-dark'];
 	
 	$rootScope.awesomeMarkerIconDefault = L.ExtraMarkers.icon({
 									icon: 'fa-number',
 									number: parseInt(0),
 									markerColor: 'blue'
 	});
-	//console.log("Marker object: ", $rootScope.awesomeMarkerIconDefault);
+	console.log("Marker object: ", $rootScope.awesomeMarkerIconDefault);
 	
 	/*var awesomeMarkerIconUpdated =  L.ExtraMarkers.icon({
 					icon: 'fa-number',
@@ -65,7 +65,7 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 			case "default": return L.ExtraMarkers.icon({
 									icon: 'fa-number',
 									number: Math.round(parseFloat(temp)),	//conversion to float and then rounding to next integer value
-									markerColor: $rootScope.color_array[groupnumber-1]});
+									markerColor: $rootScope.color_array[groupnumber]});
 							break;
 			
 			//otherUser = markers of other groups:
