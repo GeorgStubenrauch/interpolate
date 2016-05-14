@@ -22,11 +22,15 @@
 
 L.TileLayer.HeatCanvas = L.Class.extend({
 
-    initialize: function(options, heatCanvasOptions){
+    initialize: function(options, heatCanvasOptions,markerCluster){
         this.heatCanvasOptions = heatCanvasOptions;
         this.data= [];
+		//this.map;
+		this.markerCluster = markerCluster;
         this._onRenderingStart = null;
         this._onRenderingEnd = null;
+		//this.container;
+		this.canv;
     },
 
     onRenderingStart: function(cb){
@@ -55,21 +59,34 @@ L.TileLayer.HeatCanvas = L.Class.extend({
         this._degree = options.degree || HeatCanvas.LINEAR;
         this._opacity = options.opacity || 0.6;
         this._colorscheme = options.colorscheme || null;
-
+		var bounds = this.markerCluster.getBounds();
         var container = L.DomUtil.create('div', 'leaflet-heatmap-container');
         container.style.position = 'absolute';
-        container.style.width = this.map.getSize().x+"px";
-        container.style.height = this.map.getSize().y+"px";
+        //container.style.width = this.map.getSize().x+"px";
+        //container.style.height = this.map.getSize().y+"px";
+		var map_width_px = this.map.getSize().x;
+		var map_height_px = this.map.getSize().y;
+		var map_width_deg = this.map.getBounds().getNorthEast().lng - this.map.getBounds().getSouthWest().lng;
+		var map_height_deg =  this.map.getBounds().getNorthEast().lat -  this.map.getBounds().getSouthWest().lat;
+		var marker_width_deg = bounds.getNorthEast().lng - bounds.getSouthWest().lng;
+		var marker_height_deg = bounds.getNorthEast().lat - bounds.getSouthWest().lat;
+		var factor = this.getFactor();
+		container.style.width = ((map_width_px/map_width_deg)*marker_width_deg)*factor+"px";
+        container.style.height = ((map_height_px/map_height_deg)*marker_height_deg)*factor+"px";
+		//console.log(map_width_deg,map_height_deg,marker_width_deg,marker_height_deg);
+		//console.log(map_width_px,map_height_px,container.style.width,container.style.height);
+		
+        this.canv = document.createElement("canvas");
+        //canv.width = this.map.getSize().x;
+        //canv.height = this.map.getSize().y;
+		this.canv.width = (map_width_px/map_width_deg)*marker_width_deg;
+        this.canv.height = (map_height_px/map_height_deg)*marker_height_deg;
+        this.canv.style.width = (this.canv.width*factor)+"px";
+        this.canv.style.height = (this.canv.height*factor)+"px";
+        this.canv.style.opacity = this._opacity;
+        container.appendChild(this.canv);
 
-        var canv = document.createElement("canvas");
-        canv.width = this.map.getSize().x;
-        canv.height = this.map.getSize().y;
-        canv.style.width = canv.width+"px";
-        canv.style.height = canv.height+"px";
-        canv.style.opacity = this._opacity;
-        container.appendChild(canv);
-
-        this.heatmap = new HeatCanvas(canv);
+        this.heatmap = new HeatCanvas(this.canv);
         this.heatmap.onRenderingStart = this._onRenderingStart;
         this.heatmap.onRenderingEnd = this._onRenderingEnd;
         this.heatmap.bgcolor = options.bgcolor || null;
@@ -87,22 +104,74 @@ L.TileLayer.HeatCanvas = L.Class.extend({
     },
 	
     _resetCanvasPosition: function() {
-        var bounds = this.map.getBounds();
+        //var bounds = this.map.getBounds();
+		var bounds = this.markerCluster.getBounds();
         var topLeft = this.map.latLngToLayerPoint(bounds.getNorthWest());
+		
+		/*Test:*/
+		var factor = this.getFactor();
+		var map_width_px = this.map.getSize().x;
+		var map_height_px = this.map.getSize().y;
+		var map_width_deg = this.map.getBounds().getNorthEast().lng - this.map.getBounds().getSouthWest().lng;
+		var map_height_deg =  this.map.getBounds().getNorthEast().lat -  this.map.getBounds().getSouthWest().lat;
+		var marker_width_deg = bounds.getNorthEast().lng - bounds.getSouthWest().lng;
+		var marker_height_deg = bounds.getNorthEast().lat - bounds.getSouthWest().lat;
+		
+		
+		this._div.style.width = ((map_width_px/map_width_deg)*marker_width_deg)*factor+"px";
+        this._div.style.height = ((map_height_px/map_height_deg)*marker_height_deg)*factor+"px";
+		this.canv.width = (map_width_px/map_width_deg)*marker_width_deg;
+        this.canv.height = (map_height_px/map_height_deg)*marker_height_deg;
+        this.canv.style.width = (this.canv.width*factor)+"px";
+        this.canv.style.height = (this.canv.height*factor)+"px";
+        this.canv.style.opacity = this._opacity;
+		
+		//console.log(map_width_deg,map_height_deg,marker_width_deg,marker_height_deg);
+		//console.log(map_width_px,map_height_px,this.canv.style.width,this.canv.style.height);
         L.DomUtil.setPosition(this._div, topLeft);
     },
 
     _redraw: function() {
+		
         this._resetCanvasPosition();
         this.heatmap.clear();
+		
+		//Get container data to calculate the factor for canvas:
+		/*var bounds = this.markerCluster.getBounds();
+		var factor = this.getFactor();
+		var map_width_px = this.map.getSize().x;
+		var map_height_px = this.map.getSize().y;
+		var map_width_deg = this.map.getBounds().getNorthEast().lng - this.map.getBounds().getSouthWest().lng;
+		var map_height_deg =  this.map.getBounds().getNorthEast().lat -  this.map.getBounds().getSouthWest().lat;
+		var marker_width_deg = bounds.getNorthEast().lng - bounds.getSouthWest().lng;
+		var marker_height_deg = bounds.getNorthEast().lat - bounds.getSouthWest().lat;*/
+		var bounds = this.markerCluster.getBounds();
+		var topLeft = this.map.latLngToLayerPoint(bounds.getNorthWest());
+		var topLeft_string = topLeft.toString().substring(6,topLeft.toString().length-1);
+		var topLeft_array = topLeft_string.split(',');
+		var topLeft_coordinates = [];
+		topLeft_coordinates.push(parseInt(topLeft_array[0]));
+		topLeft_coordinates.push(parseInt(topLeft_array[1]));
+		console.log("Array topleft: ", topLeft_coordinates[0], topLeft_coordinates[1]);
+		
+		
         if (this.data.length > 0) {
             for (var i=0, l=this.data.length; i<l; i++) {
                 var lonlat = new L.LatLng(this.data[i].lat, this.data[i].lon);
                 var localXY = this.map.latLngToLayerPoint(lonlat);
                 localXY = this.map.layerPointToContainerPoint(localXY);
+				
+				console.log("x map: ", localXY.x, ", y map: ", localXY.y);
+				var localXY_string = localXY.toString().substring(6,localXY.toString().length-1);
+				var localXY_string_array = localXY_string.split(',');
+				var localXY_x = parseFloat(localXY_string_array[0])-topLeft_coordinates[0];
+				var localXY_y = parseFloat(localXY_string_array[1])-topLeft_coordinates[1];
+				console.log("x marker: ", localXY_x, ", y marker: ", localXY_y);
                 this.heatmap.push(
-                        Math.floor(localXY.x), 
-                        Math.floor(localXY.y), 
+                        /*Math.floor(localXY.x), 
+                        Math.floor(localXY.y),*/
+						Math.floor(localXY_x), 
+                        Math.floor(localXY_y), 
                         this.data[i].v);
             }
 
@@ -118,7 +187,12 @@ L.TileLayer.HeatCanvas = L.Class.extend({
 
     redraw: function(){
         this._redraw();
-    }
+    },
+	
+	getFactor: function() {
+		var zoom = this.map.getZoom();
+		return Math.pow(2,(zoom-8));
+	}
 
 });
 

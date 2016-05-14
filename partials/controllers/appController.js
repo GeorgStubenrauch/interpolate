@@ -21,6 +21,7 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 	$rootScope.school = "";				//needed to determine the markers to be displayed for a teacher
 	
 	$rootScope.marker_array = [];
+	$rootScope.marker_cluster = new L.featureGroup();
 	
 	$rootScope.color_array = ['black','blue','yellow','red','brown','cyan','orange','blue-dark','purple','green-dark'];
 	
@@ -29,7 +30,7 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 									number: parseInt(0),
 									markerColor: 'blue'
 	});
-	console.log("Marker object: ", $rootScope.awesomeMarkerIconDefault);
+	//console.log("EditItems: ", $rootScope.editItems.getBounds());
 	
 	/*var awesomeMarkerIconUpdated =  L.ExtraMarkers.icon({
 					icon: 'fa-number',
@@ -132,7 +133,6 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 					name: "Temperaturen",
 					type: "group",
 					visible: true
-					
 				}
 			}
 		},
@@ -316,6 +316,8 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 				new L.Control.Zoom({ position: 'bottomright' }).addTo(map);
 				
 				});
+				
+				$rootScope.map = map;
 			
 	});	// map preparation
 		/*
@@ -364,7 +366,7 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 
 */
 	//Create an array to store the measurement data for interpolation:
-	//$rootScope.measurements = [];
+	$rootScope.measurements = [];
 	/*$rootScope.measurements = {
 		max: 45,
 		data: []
@@ -460,9 +462,15 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 					$rootScope.marker_array.push(marker);
 					
 					//Adding measurement data for interpolation:
-					//var this_measurement = new Array(eval(feature.geometry.coordinates[0]), eval(feature.geometry.coordinates[1]), parseFloat(feature.properties.temp));
-					//$rootScope.measurements.push(this_measurement);
-					 //$rootScope.measurements.data.push({lat: eval(feature.geometry.coordinates[0]), lng:eval(feature.geometry.coordinates[1]), temp: parseFloat(feature.properties.temp)});
+					var this_measurement = new Array(eval(feature.geometry.coordinates[0]), eval(feature.geometry.coordinates[1]), parseFloat(feature.properties.temp));
+					$rootScope.measurements.push(this_measurement);
+					
+					//Add marker to marker_cluster object, used to get bounds from markers:
+					$rootScope.marker_cluster.addLayer(marker);
+					
+					
+					
+					//$rootScope.measurements.data.push({lat: eval(feature.geometry.coordinates[0]), lng:eval(feature.geometry.coordinates[1]), temp: parseFloat(feature.properties.temp)});
 				}
 				// if marker is already displayed, check if necessary to update the value:
 				else {
@@ -513,7 +521,10 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 			//leafletData.getMap().then(function(map){map.panBy([10,10]);map.panBy([-10,-10]);});
 			
 			//after first use -> set $scope.display_markers to true:
-			$rootScope.display_markers = true;			
+			$rootScope.display_markers = true;
+
+			//Call heatmap measurement function to add data to heatmap for creation of heatmap:
+			$rootScope.updateHeatmapData();
 			
 		});
 		
@@ -528,7 +539,7 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 	//Canvas Overlay part:
 	
 	//necessary functions:
-	$scope.drawingOnCanvas = function(canvasOverlay, params) {
+	/*$scope.drawingOnCanvas = function(canvasOverlay, params) {
 		//kriging variogram calculation
 			//data
 			var t = [21, 30, 15, 15];
@@ -540,7 +551,7 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 		    var sigma2 = 0.1, alpha = 1;
 		    var variogram = kriging.train(t, x, y, model, sigma2, alpha);*/
 
-        var ctx = params.canvas.getContext('2d');
+      /*  var ctx = params.canvas.getContext('2d');
         console.log("width of the canvas: " + params.canvas.width + " height of the canvas: " + params.canvas.height);
         ctx.clearRect(0, 0, params.canvas.width, params.canvas.height);
     //    ctx.fillStyle = "rgba(255,116,0, 0.2)";
@@ -649,27 +660,37 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 	}*/
 	
 	//Canvas:
-	leafletData.getMap().then(function(map) {
+	/*leafletData.getMap().then(function(map) {
 		if (typeof map != 'undefined'){
 			$rootScope.map = map;
 			new L.canvasOverlay()
 		            .drawing($scope.drawingOnCanvas)
 		            .addTo(map);
 	    }
-	});
+	});*/
 	//Heatcanvas try:
 	//Definition of a global function, this way it can be called inside the interpolate-module
-	/*$rootScope.getInterpolation = function(measurements) {
-		if (measurements.length > 0) {
-			for(var i=0,l=measurements.length; i<l; i++) {
-                $rootScope.heatmap.pushData(measurements[i][0], measurements[i][1], measurements[i][2]);
+	$rootScope.updateHeatmapData = function() {
+		if ($rootScope.measurements.length > 0) {
+			for(var i=0,l=$rootScope.measurements.length; i<l; i++) {
+                $rootScope.heatmap.pushData($rootScope.measurements[i][0], $rootScope.measurements[i][1], $rootScope.measurements[i][2]);
             }
+			leafletData.getMap().then(function(map) {
+				$rootScope.heatmap.addTo(map);
+				//$rootScope.heatmap.setMarkerCluster($rootScope.marker_cluster);
+				console.log("Map: ", map.getSize().x, map.getSize().y);
+				console.log("EditItems: ", $rootScope.editItems);
+				console.log("Marker bounds: ", $rootScope.marker_cluster);
+			});
+			/*leafletData.getLayers().then(function(baselayers) {
+				console.log($rootScope.marker_cluster.getBounds());
+			});*/
 		}
 	}
 	//Leaflet.heatcanvas:
 	$rootScope.heatmap = new
                 L.TileLayer.HeatCanvas({},{'step':0.5,
-                'degree':HeatCanvas.LINEAR, 'opacity':0.7});
+                'degree':HeatCanvas.LINEAR, 'opacity':0.7},$rootScope.marker_cluster);
 				
 	/*if ($rootScope.measurements.length > 0) {
 		!$scope.display_heatcanvas;*/

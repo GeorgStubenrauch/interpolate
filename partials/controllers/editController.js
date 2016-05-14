@@ -106,6 +106,9 @@ app.controller('editCtrl', [ '$scope', '$rootScope', '$http',  function($scope, 
 					console.log("in IF!");
 					$rootScope.editItems.removeLayer(marker);
 					
+					//Remove marker from marker cluster:
+					$rootScope.marker_cluster.removeLayer(marker);
+					
 					//Remove id from array used to controll addition of markers:
 					var id_index = $rootScope.markers.indexOf($scope.feature.id);
 					if (id_index > -1) {

@@ -57,7 +57,7 @@ app.controller('loginCtrl', [ '$scope', '$rootScope', '$http',  function($scope,
 						$rootScope.displayMarkers();
 						
 						//Changing the color of the default icon depending on the group:
-						$rootScope.awesomeMarkerIconDefault.options.markerColor = $rootScope.color_array[$rootScope.getGroupnumber($rootScope.username)-1];
+						$rootScope.awesomeMarkerIconDefault.options.markerColor = $rootScope.color_array[$rootScope.getGroupnumber($rootScope.username)];
 						
 						//Heatcanvas Test:
 						/*if ($rootScope.measurements.length > 0) {
