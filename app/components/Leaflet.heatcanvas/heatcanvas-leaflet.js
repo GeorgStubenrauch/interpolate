@@ -135,7 +135,7 @@ L.TileLayer.HeatCanvas = L.Class.extend({
 		
         this._resetCanvasPosition();
         this.heatmap.clear();
-		
+		console.log("Data: ", this.data);
 		//Get container data to calculate the factor for canvas:
 		/*var bounds = this.markerCluster.getBounds();
 		var factor = this.getFactor();
@@ -174,7 +174,7 @@ L.TileLayer.HeatCanvas = L.Class.extend({
                         Math.floor(localXY_y), 
                         this.data[i].v);
             }
-
+			console.log("Data: ", this.data);
             this.heatmap.render(this._step, this._degree, this._colorscheme);
         }
         return this;
