@@ -27,6 +27,7 @@ app.controller('loginCtrl', [ '$scope', '$rootScope', '$http',  function($scope,
 					if ($rootScope.username != "") {
 						$rootScope.marker_array.forEach(function(marker) {
 							$rootScope.editItems.removeLayer(marker);
+							$rootScope.marker_cluster.removeLayer(marker);
 						});
 						$rootScope.markers = [];
 						$rootScope.markers.length = 0;
@@ -59,10 +60,6 @@ app.controller('loginCtrl', [ '$scope', '$rootScope', '$http',  function($scope,
 						//Changing the color of the default icon depending on the group:
 						$rootScope.awesomeMarkerIconDefault.options.markerColor = $rootScope.color_array[$rootScope.getGroupnumber($rootScope.username)];
 						
-						//Heatcanvas Test:
-						/*if ($rootScope.measurements.length > 0) {
-							$rootScope.getInterpolation($rootScope.measurements);
-						}*/
 						alert("Login was successful"); //Error?
 					}
 					

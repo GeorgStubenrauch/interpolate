@@ -21,6 +21,9 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 	$rootScope.classname = "";			//needed to determine the markers to be displayed for a teacher
 	$rootScope.school = "";				//needed to determine the markers to be displayed for a teacher
 	
+	//Control variable for heatmap:
+	$rootScope.heatmap_visible = false;
+	
 	//Variable for "geolocate" button:
 	$scope.locateButton;
 	
@@ -733,8 +736,7 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 			$rootScope.display_markers = true;
 
 			//Call heatmap measurement function to add data to heatmap for creation of heatmap:
-			$rootScope.updateHeatmapData();
-			
+			$rootScope.updateHeatmapData($rootScope.measurements);
 		});
 		
 		
@@ -879,28 +881,38 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 	});*/
 	//Heatcanvas try:
 	//Definition of a global function, this way it can be called inside the interpolate-module
-	$rootScope.updateHeatmapData = function() {
-		if ($rootScope.measurements.length > 0) {
-			for(var i=0,l=$rootScope.measurements.length; i<l; i++) {
-                $rootScope.heatmap.pushData($rootScope.measurements[i][0], $rootScope.measurements[i][1], $rootScope.measurements[i][2]);
+	$rootScope.updateHeatmapData = function(measurements) {
+		if ($rootScope.heatmap_visible == true) {
+			$rootScope.heatmap.clear();
+		}
+		if (measurements.length > 3) {
+			for(var i=0,l=measurements.length; i<l; i++) {
+                $rootScope.heatmap.pushData(measurements[i][0], measurements[i][1], measurements[i][2]);
             }
-			leafletData.getMap().then(function(map) {
-				$rootScope.heatmap.addTo(map);
-				//$rootScope.heatmap.setMarkerCluster($rootScope.marker_cluster);
-				//console.log("Map: ", map.getSize().x, map.getSize().y);
-				//console.log("EditItems: ", $rootScope.editItems);
-				//console.log("Marker bounds: ", $rootScope.marker_cluster);
-			});
 			/*leafletData.getLayers().then(function(baselayers) {
 				console.log($rootScope.marker_cluster.getBounds());
 			});*/
+			if ($rootScope.heatmap_visible == false) {
+				leafletData.getMap().then(function(map) {
+					$rootScope.heatmap.addTo(map);
+					//$rootScope.heatmap.setMarkerCluster($rootScope.marker_cluster);
+					//console.log("Map: ", map.getSize().x, map.getSize().y);
+					//console.log("EditItems: ", $rootScope.editItems);
+					//console.log("Marker bounds: ", $rootScope.marker_cluster);
+				});	
+				$rootScope.heatmap_visible = true;
+			} else {
+				$rootScope.heatmap.redraw();
+			}
 		}
 	}
+	
 	//Leaflet.heatcanvas:
 	$rootScope.heatmap = new
                 L.TileLayer.HeatCanvas({},{'step':0.5,
                 'degree':HeatCanvas.CUBIC, 'opacity':0.7},$rootScope.marker_cluster);
-				
+	
+	
 	/*if ($rootScope.measurements.length > 0) {
 		!$scope.display_heatcanvas;*/
 	//$rootScope.heatmap.addTo($rootScope.map);
