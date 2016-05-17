@@ -39,14 +39,14 @@ app.controller('editCtrl', [ '$scope', '$rootScope', '$http',  function($scope, 
 			$rootScope.editItems._layers[$scope.feature._leaflet_id].setIcon(thisIcon);
 			
 			// Saving _latlng object of $scope object as a new variable:
-			latLong = $scope.feature._latlng;
+			latLon = $scope.feature._latlng;
 			
 			//Newly created markers that are not yet stored inside the database -> INSERT INTO
 			if (typeof $scope.feature.id == "undefined") {
 				//Saving the measurement inside the database by passing the username, coordinates (lat,lon) and the temperature:
-				$http.get('partials/controllers/saveData.php?USER=' + $rootScope.username + '&LAT=' + latLong.lat + '&LON=' + latLong.lng + '&TEMP=' + $scope.temp + '&EXISTS=false&ID=-1').success(function(data,status) {
+				$http.get('partials/controllers/saveData.php?USER=' + $rootScope.username + '&LAT=' + latLon.lat + '&LON=' + latLon.lng + '&TEMP=' + $scope.temp + '&EXISTS=false&ID=-1').success(function(data,status) {
 					//console.log("Returned data");
-					//console.log(data);
+					console.log(data);
 					
 					//Add id of marker entry to array:
 					//$rootScope.markers.push(parseInt(data));
@@ -64,7 +64,7 @@ app.controller('editCtrl', [ '$scope', '$rootScope', '$http',  function($scope, 
 
 					$scope.interarray = [];
 					inttemp = parseInt($scope.temp);
-					$scope.interarray.push(latLong["lat"], latLong["lng"],inttemp);
+					$scope.interarray.push(latLon["lat"], latLon["lng"],inttemp);
 
 					console.log("interarray......................................");
 					console.log($scope.interarray);
@@ -76,7 +76,7 @@ app.controller('editCtrl', [ '$scope', '$rootScope', '$http',  function($scope, 
 				});
 			//Existing markers that are already stored inside the database -> UPDATE
 			} else {
-				$http.get('partials/controllers/saveData.php?USER=' + $rootScope.username + '&LAT=' + latLong.lat + '&LON=' + latLong.lng + '&TEMP=' + $scope.temp + '&EXISTS=true&ID=' + $scope.feature.id ).success(function(data,status) {
+				$http.get('partials/controllers/saveData.php?USER=' + $rootScope.username + '&LAT=' + latLon.lat + '&LON=' + latLon.lng + '&TEMP=' + $scope.temp + '&EXISTS=true&ID=' + $scope.feature.id ).success(function(data,status) {
 					//console.log("Returned data");
 					//console.log(data);
 					//Add id of marker entry to array:

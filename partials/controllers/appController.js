@@ -21,6 +21,12 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 	$rootScope.classname = "";			//needed to determine the markers to be displayed for a teacher
 	$rootScope.school = "";				//needed to determine the markers to be displayed for a teacher
 	
+	//Variable for "geolocate" button:
+	$scope.locateButton;
+	
+	
+	//Marker variables and functions:
+	
 	$rootScope.marker_array = [];						//all markers displayed on the map are stored inside this array
 	$rootScope.marker_cluster = new L.featureGroup();	//again all markers are stored inside used to get bounds for markers in HeatCanvas
 	
@@ -118,7 +124,7 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 	}
 	
 	//Function to determine a user's geolocation:
-	$scope.showResult = function () {
+	/*$scope.showResult = function () {
             return $scope.error == "";
     }
  
@@ -147,9 +153,9 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 				// Show input dialog
 				$rootScope.$broadcast("startedit", {feature: marker});
 			}
-    }
+    }*/
  
-    $scope.showError = function (error) {
+    /*$scope.showError = function (error) {
         switch (error.code) {
 			case error.PERMISSION_DENIED:
 				$scope.error = "User denied the request for Geolocation."
@@ -165,10 +171,42 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
                 break;
         }
         $scope.$apply();
-    }
+    }*/
+	
+		
+	function onLocationFound(e) {
+		
+		/*var radius = e.accuracy / 2;
+		L.marker(e.latlng).addTo(map)
+			.bindPopup("You are within " + radius + " meters from this point").openPopup();
+		L.circle(e.latlng, radius).addTo(map);*/
+		
+		//Coordinates of location for marker:
+		var latLon = e.latlng;
+		
+		//Creation of the marker:
+		var marker = $scope.createMarker(latLon.lat,latLon.lng,parseInt(0),"default",$rootScope.username);
+			
+		//If marker creation was successful show input dialog:
+		if (marker) {
+				
+			//Add marker to editItems:
+			$rootScope.editItems.addLayer(marker);
+				
+			// Show input dialog
+			$rootScope.$broadcast("startedit", {feature: marker});
+		}
+		
+		$scope.locateButton.state('un_loaded');
+	}
+
+	function onLocationError(e) {
+		alert(e.message);
+		$scope.locateButton.state('error');
+	}
  
-    $scope.getLocation = function (control) {
-		if (navigator.geolocation) {
+    $scope.getLocation = function () {
+		/*if (navigator.geolocation) {
 			navigator.geolocation.getCurrentPosition($scope.getCoordinates, $scope.showError);
 			control.state('un_loaded');
         }
@@ -176,7 +214,10 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 			$scope.error = "Geolocation is not supported by this browser.";
 			alert("Geolocation is not supported by this browser.");
 			control.state('error');
-        }
+        }*/
+		leafletData.getMap().then(function(map) {
+			map.locate({setView: true, maxZoom: 11});
+		});
     }
  
      //$scope.getLocation();
@@ -275,7 +316,7 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 	
 	leafletData.getMap().then(function(map) {
 		console.log("Map object: ",map);
-		var locateButton = L.easyButton({
+		$scope.locateButton = L.easyButton({
 			states:[{
 				stateName: 'un_loaded',
 				icon: 'fa-location-arrow',
@@ -291,7 +332,7 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 							control.state('error');
 						});
 						control._map.locate()*/
-						$scope.getLocation(control);
+						$scope.getLocation();
 					} else {
 						alert("Bitte loggen Sie sich ein!");
 					}
@@ -317,7 +358,14 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 				}
 			}*/]
 		});
-		locateButton.addTo(map);
+		$scope.locateButton.addTo(map);
+		
+		console.log("Test control: ", $scope.locateButton);
+		
+		//Geolocation using leaflet map object:
+		map.on('locationfound', onLocationFound);
+		map.on('locationerror', onLocationError);
+		
 		/*HeatLayer:
 		/*addressPoints = addressPoints.map(function(p) { return [p[0], p[1]] } );
 		Heat:	--> multidimensional array needed
