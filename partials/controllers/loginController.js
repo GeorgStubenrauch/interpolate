@@ -63,8 +63,7 @@ app.controller('loginCtrl', [ '$scope', '$rootScope', '$http',  function($scope,
 						/*if ($rootScope.measurements.length > 0) {
 							$rootScope.getInterpolation($rootScope.measurements);
 						}*/
-						alert("Login was successful!"); //Error?
-						
+						alert("Login was successful"); //Error?
 					}
 					
 				//If the username is neither in teachers nor in users:

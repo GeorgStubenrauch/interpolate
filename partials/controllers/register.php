@@ -38,8 +38,21 @@
 		}
 	}
 	
-	//Update the number of registered usernames of the teacher:
-	/*Code following*/
+	//Update the number of registered usernames of the teacher using the respective (teacher-)id:
+	
+	//Query to count the entries inside the table users with a similar username:
+	$sql = "SELECT count(ID) as count_user FROM 'users' WHERE TEACHER_ID = '".$tid."'";
+	
+	//Execute query:
+	//save query results:
+	$result = $db->query($sql);
+	
+	//Get the number of users:
+	$row = $result->fetchArray();
+	$userCount = $row['count_user'];
+	
+	//Insertion of / Updating of existing entry with the latest value into field "amount" of table "teachers":
+	$db->exec("UPDATE teachers SET amount = ".$userCount." WHERE ID = ".$tid.";");	
 	
     // close the database connection
     $db->close();

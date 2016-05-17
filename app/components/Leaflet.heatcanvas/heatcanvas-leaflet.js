@@ -135,7 +135,7 @@ L.TileLayer.HeatCanvas = L.Class.extend({
 		
         this._resetCanvasPosition();
         this.heatmap.clear();
-		console.log("Data: ", this.data);
+		//console.log("Data: ", this.data);
 		//Get container data to calculate the factor for canvas:
 		/*var bounds = this.markerCluster.getBounds();
 		var factor = this.getFactor();
@@ -152,7 +152,7 @@ L.TileLayer.HeatCanvas = L.Class.extend({
 		var topLeft_coordinates = [];
 		topLeft_coordinates.push(parseInt(topLeft_array[0]));
 		topLeft_coordinates.push(parseInt(topLeft_array[1]));
-		console.log("Array topleft: ", topLeft_coordinates[0], topLeft_coordinates[1]);
+		//console.log("Array topleft: ", topLeft_coordinates[0], topLeft_coordinates[1]);
 		
 		
         if (this.data.length > 0) {
@@ -161,12 +161,12 @@ L.TileLayer.HeatCanvas = L.Class.extend({
                 var localXY = this.map.latLngToLayerPoint(lonlat);
                 localXY = this.map.layerPointToContainerPoint(localXY);
 				
-				console.log("x map: ", localXY.x, ", y map: ", localXY.y);
+				//console.log("x map: ", localXY.x, ", y map: ", localXY.y);
 				var localXY_string = localXY.toString().substring(6,localXY.toString().length-1);
 				var localXY_string_array = localXY_string.split(',');
 				var localXY_x = parseFloat(localXY_string_array[0])-topLeft_coordinates[0];
 				var localXY_y = parseFloat(localXY_string_array[1])-topLeft_coordinates[1];
-				console.log("x marker: ", localXY_x, ", y marker: ", localXY_y);
+				//console.log("x marker: ", localXY_x, ", y marker: ", localXY_y);
                 this.heatmap.push(
                         /*Math.floor(localXY.x), 
                         Math.floor(localXY.y),*/
@@ -174,7 +174,7 @@ L.TileLayer.HeatCanvas = L.Class.extend({
                         Math.floor(localXY_y), 
                         this.data[i].v);
             }
-			console.log("Data: ", this.data);
+			//console.log("Data: ", this.data);
             this.heatmap.render(this._step, this._degree, this._colorscheme);
         }
         return this;

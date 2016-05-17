@@ -45,8 +45,8 @@ app.controller('editCtrl', [ '$scope', '$rootScope', '$http',  function($scope, 
 			if (typeof $scope.feature.id == "undefined") {
 				//Saving the measurement inside the database by passing the username, coordinates (lat,lon) and the temperature:
 				$http.get('partials/controllers/saveData.php?USER=' + $rootScope.username + '&LAT=' + latLong.lat + '&LON=' + latLong.lng + '&TEMP=' + $scope.temp + '&EXISTS=false&ID=-1').success(function(data,status) {
-					console.log("Returned data");
-					console.log(data);
+					//console.log("Returned data");
+					//console.log(data);
 					
 					//Add id of marker entry to array:
 					//$rootScope.markers.push(parseInt(data));
