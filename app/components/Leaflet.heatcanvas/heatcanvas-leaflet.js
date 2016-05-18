@@ -31,6 +31,12 @@ L.TileLayer.HeatCanvas = L.Class.extend({
         this._onRenderingEnd = null;
 		//this.container;
 		this.canv;
+		//this.deltax_px = 0;
+		//this.deltay_px = 0;
+		this.mapTopLeftLayerPoints_x_new;
+		this.mapTopLeftLayerPoints_y_new;
+		this.mapTopLeftLayerPoints_x_old;
+		this.mapTopLeftLayerPoints_y_old;
     },
 
     onRenderingStart: function(cb){
@@ -92,6 +98,16 @@ L.TileLayer.HeatCanvas = L.Class.extend({
         this.heatmap.bgcolor = options.bgcolor || null;
         this._div = container;
         this.map.getPanes().overlayPane.appendChild(this._div);
+		
+		//Get map bounds and convert them to Layer Points:
+		var bounds = this.map.getBounds();
+        var topLeft = this.map.latLngToLayerPoint(bounds.getNorthWest());
+		var topLeft_string = topLeft.toString().substring(6,topLeft.toString().length-1);
+		var topLeft_array = topLeft_string.split(',');
+		this.mapTopLeftLayerPoints_x_new = parseInt(topLeft_array[0]);
+		this.mapTopLeftLayerPoints_y_new = parseInt(topLeft_array[1]);
+		this.mapTopLeftLayerPoints_x_old = parseInt(topLeft_array[0]);
+		this.mapTopLeftLayerPoints_y_old = parseInt(topLeft_array[1]);
     },
 
     pushData: function(lat, lon, value) {
@@ -104,9 +120,21 @@ L.TileLayer.HeatCanvas = L.Class.extend({
     },
 	
     _resetCanvasPosition: function() {
-        //var bounds = this.map.getBounds();
+		
+		//Old:
 		var bounds = this.markerCluster.getBounds();
+		console.log("Bounds: ", bounds);
         var topLeft = this.map.latLngToLayerPoint(bounds.getNorthWest());
+		//console.log("Topleft: ", topLeft);
+		
+		//New: Get topLeft position of map object and compare it to default positions:
+		//Get map bounds and convert them to Layer Points:
+		var bounds_map = this.map.getBounds();
+        var topLeft_map = this.map.latLngToLayerPoint(bounds_map.getNorthWest());
+		var topLeft_map_string = topLeft_map.toString().substring(6,topLeft_map.toString().length-1);
+		var topLeft_map_array = topLeft_map_string.split(',');
+		this.mapTopLeftLayerPoints_x_new = parseInt(topLeft_map_array[0]);
+		this.mapTopLeftLayerPoints_y_new = parseInt(topLeft_map_array[1]);
 		
 		/*Test:*/
 		var factor = this.getFactor();
@@ -135,6 +163,7 @@ L.TileLayer.HeatCanvas = L.Class.extend({
 		
         this._resetCanvasPosition();
         this.heatmap.clear();
+		//console.log("Redraw - this.canv: ", this.canv);
 		//console.log("Data: ", this.data);
 		//Get container data to calculate the factor for canvas:
 		/*var bounds = this.markerCluster.getBounds();
@@ -145,15 +174,20 @@ L.TileLayer.HeatCanvas = L.Class.extend({
 		var map_height_deg =  this.map.getBounds().getNorthEast().lat -  this.map.getBounds().getSouthWest().lat;
 		var marker_width_deg = bounds.getNorthEast().lng - bounds.getSouthWest().lng;
 		var marker_height_deg = bounds.getNorthEast().lat - bounds.getSouthWest().lat;*/
+		
+		//Calculate delta_x and delta_y by comparing the old and new values of the topLeft map values:
+		this.delta_x = this.mapTopLeftLayerPoints_x_new - this.mapTopLeftLayerPoints_x_old;
+		this.delta_y = this.mapTopLeftLayerPoints_y_new - this.mapTopLeftLayerPoints_y_old;
+		
+		//Adjusting the topLeft value with the help of both delta values:
 		var bounds = this.markerCluster.getBounds();
 		var topLeft = this.map.latLngToLayerPoint(bounds.getNorthWest());
 		var topLeft_string = topLeft.toString().substring(6,topLeft.toString().length-1);
 		var topLeft_array = topLeft_string.split(',');
 		var topLeft_coordinates = [];
-		topLeft_coordinates.push(parseInt(topLeft_array[0]));
-		topLeft_coordinates.push(parseInt(topLeft_array[1]));
+		topLeft_coordinates.push(parseInt(topLeft_array[0])-this.delta_x);
+		topLeft_coordinates.push(parseInt(topLeft_array[1])-this.delta_y);
 		//console.log("Array topleft: ", topLeft_coordinates[0], topLeft_coordinates[1]);
-		
 		
         if (this.data.length > 0) {
             for (var i=0, l=this.data.length; i<l; i++) {
@@ -166,10 +200,10 @@ L.TileLayer.HeatCanvas = L.Class.extend({
 				var localXY_string_array = localXY_string.split(',');
 				var localXY_x = parseFloat(localXY_string_array[0])-topLeft_coordinates[0];
 				var localXY_y = parseFloat(localXY_string_array[1])-topLeft_coordinates[1];
-				//console.log("x marker: ", localXY_x, ", y marker: ", localXY_y);
+				console.log("x marker: ", localXY_x, ", y marker: ", localXY_y);
                 this.heatmap.push(
-                        /*Math.floor(localXY.x), 
-                        Math.floor(localXY.y),*/
+                        //Math.floor(localXY.x), 
+                        //Math.floor(localXY.y),
 						Math.floor(localXY_x), 
                         Math.floor(localXY_y), 
                         this.data[i].v);

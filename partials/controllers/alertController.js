@@ -9,7 +9,7 @@ app.controller('alertCtrl', [ '$scope', '$rootScope', '$http',  function($scope,
 		
 		$scope.titel = $rootScope.modaltitel;
 		$scope.message = $rootScope.modalmessage;
-		console.log("Titel: ", $scope.titel, ", message: ", $scope.message);
+		//console.log("Titel: ", $scope.titel, ", message: ", $scope.message);
 		$scope.modalalert = true;
 		console.log("Modal open!");
 		

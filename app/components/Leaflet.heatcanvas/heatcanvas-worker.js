@@ -25,11 +25,11 @@ onmessage = function(e){
 
 function calc(params) {
     value = params.value || {};
-	console.log(value);
+	//console.log(value);
     degree = params.degree || 1;
 
     for(var pos in params.data){
-		console.log(pos);
+		//console.log(pos);
         var data = params.data[pos];
         var radius = Math.floor(Math.pow((data / params.step), 1/degree));
         
@@ -66,7 +66,7 @@ function calc(params) {
             }
         }        
     }
-	console.log(Object.keys(value).length);
-	console.log(value);
+	//console.log(Object.keys(value).length);
+	//console.log(value);
     postMessage({'value': value});
 }
