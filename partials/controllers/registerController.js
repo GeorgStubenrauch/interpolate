@@ -13,7 +13,8 @@ app.controller('registerCtrl', [ '$scope', '$rootScope', '$http',  function($sco
 			var amount = parseInt($scope.amount,0);
 			if (amount <= 0 || isNaN(amount))
 			{
-				alert('Bitte geben Sie eine Anzahl ein!');
+				//alert('Bitte geben Sie eine Anzahl ein!');
+				$rootScope.showAlert("Fehler!","Bitte geben Sie eine Anzahl an!");
 				$scope.registering = true;
 				return;
 			}
@@ -53,14 +54,16 @@ app.controller('registerCtrl', [ '$scope', '$rootScope', '$http',  function($sco
 					$scope.part2 = "";
 					$scope.amount = "";
 				}*/
-				alert(string_alert);
+				//alert(string_alert);
+				$rootScope.showAlert("Ergebnis:",string_alert);
 				if (count_errors > 0 ) {
 					$scope.registering = true;
 				}
 			});
 			
 		} else {
-			alert("Bitte füllen Sie die Felder vollständig aus!");
+			//alert("Bitte füllen Sie die Felder vollständig aus!");
+			$rootScope.showAlert("Fehler!","Bitte füllen Sie die Felder vollständig aus!");
 			$scope.registering = true;
 		}
 		

@@ -19,9 +19,11 @@ app.controller('classCtrl', [ '$scope', '$rootScope', '$http',  function($scope,
 			
 			//Changing the color of the default icon depending on the group (here teacher):
 			$rootScope.awesomeMarkerIconDefault.options.markerColor = $rootScope.color_array[$rootScope.getGroupnumber($rootScope.username)];
-						
+			
+			$rootScope.showAlert("Erfolg!","Der Login war erfolgreich!");
 		} else {
-			alert("Please enter a valid school- and classname!");
+			//alert("Please enter a valid school- and classname!");
+			$rootScope.showAlert("Fehler!","Bitte Sie sowohl einen Schul- <br /> als auch einen Klassennamen ein!");
 			$scope.gettingclass = true;
 		}
 		

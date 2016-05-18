@@ -192,6 +192,16 @@ L.TileLayer.HeatCanvas = L.Class.extend({
 	getFactor: function() {
 		var zoom = this.map.getZoom();
 		return Math.pow(2,(zoom-8));
+	},
+	
+	save: function(school,classname,date,control) {
+		var year = date.getFullYear();
+		var month = date.getMonth() + 1;
+		var day = date.getDate();
+		this.canv.toBlob(function(blob) {
+			saveAs(blob, school+"_"+classname+"_"+year.toString()+"_"+month.toString()+"_"+day.toString()+".png");
+		});
+		control.state("un_saved");
 	}
 
 });

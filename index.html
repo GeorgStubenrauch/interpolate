@@ -24,6 +24,7 @@
 	<script src="app/components/Leaflet.ExtraMarkers/dist/js/leaflet.extra-markers.min.js"></script>
 	<script src="app/components/Canvas_Overlay/L.CanvasOverlay.js"></script>
 	<script src="app/components/Leaflet.EasyButton-master/src/easy-button.js"></script>
+	<script src="app/components/FileSaver.js-master/FileSaver.js"></script>
 	<!--<script src="app/components/kriging/kriging.js"></script>-->
 	
 	<!--Leaflet.heatcanvas inclusive Leaflet 0.7.7-->
@@ -51,6 +52,7 @@
 	<script src="partials/controllers/loginController.js"></script>
 	<script src="partials/controllers/registerController.js"></script>
 	<script src="partials/controllers/classController.js"></script>
+	<script src="partials/controllers/alertController.js"></script>
 		
 	<link rel="stylesheet" href="partials/css/mod_leaflet-sidebar.min.css">
 	<link rel="stylesheet" href="partials/css/charts.css">
@@ -96,9 +98,11 @@
 							<div class="input-group-addon">°C</div>	
 						</div>
 			</div>
-			<div class="btn btn-primary" ng-show="editable" ng-click="save()">Save</button></div>
-			<div class="btn btn-secondary" ng-show="editable" ng-click="deleteMarker()">Delete</button></div>
-			<div class="modal-footer"></div>
+			
+			<div class="modal-footer">
+				<div class="btn btn-primary" ng-show="editable" ng-click="save()">Save</button></div>
+				<div class="btn btn-secondary" ng-show="editable" ng-click="deleteMarker()">Delete</button></div>
+			</div>
 		</div>
 	</div>
 	
@@ -117,9 +121,11 @@
 							<input type="text" ng-model="user" class="form-control" required>
 						</div>
 			</div>
-			<div class="btn btn-primary"  ng-click="login()">Login</button></div>
-			<div class="btn btn-secondary" ng-show="teacher" ng-click="switchToRegister()">Register</button></div>
-			<div class="modal-footer"></div>
+			
+			<div class="modal-footer">
+				<div class="btn btn-primary"  ng-click="login()">Login</button></div>
+				<div class="btn btn-secondary" ng-show="teacher" ng-click="switchToRegister()">Register</button></div>
+			</div>
 		</div>
 	</div>
 	
@@ -146,8 +152,10 @@
 							<input type="text" ng-model="amount" class="form-control"  required>
 						</div>
 			</div>
-			<div class="btn btn-primary"  ng-click="register()">Register!</button></div>
-			<div class="modal-footer"></div>
+			
+			<div class="modal-footer">
+				<div class="btn btn-primary"  ng-click="register()">Register!</button></div>
+			</div>
 		</div>
 	</div>
 	
@@ -170,11 +178,29 @@
 							<input type="text" ng-model="part2" class="form-control" required>
 						</div>
 			</div>
-			<div class="btn btn-primary"  ng-click="getClass()">Klasse!</button></div>
-			<div class="modal-footer"></div>
+			
+			<div class="modal-footer">
+				<div class="btn btn-primary"  ng-click="getClass()">Klasse!</button></div>
+			</div>
 		</div>
 	</div>
-
+	
+	<!-- Alert modal box -->
+	<div class="modal-content alertPopup" ng-controller="alertCtrl" ng-show="modalalert">
+		
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click="close()"><i class="fa fa-times"></i></button>
+			<h4 ng-model="titel"><span ng-bind="titel"></h4>
+		</div>
+		<div class="modal-body">
+			<p ng-model="message"><span ng-bind="message"></p>
+			
+			<div class="modal-footer">
+				<div class="btn btn-secondary"  ng-click="close()">OK!</button></div>
+			</div>
+		</div>
+		
+	</div>
     <!--<p id="status"></p>  heatcanvas-->
   </body>
 </html>

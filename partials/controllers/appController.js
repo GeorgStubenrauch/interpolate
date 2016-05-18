@@ -13,6 +13,10 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 	$scope.loggingin = false;	//login modal window
 	$scope.registering = false;	//register modal window
 	$scope.gettingclass = false;	//class modal window
+	$scope.modalalert = false;		//alert modal window
+	
+	$rootScope.modaltitel = "";
+	$rootScope.modalmessage = "";
 	
 	$rootScope.username = "";			//username
 	$rootScope.teachername = "";
@@ -124,6 +128,14 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
         });
 		
 		return marker;
+	}
+	
+	//Function to display "alert" in a modal window:
+	$rootScope.showAlert = function(titel,message) {
+		$rootScope.modaltitel = titel;
+		$rootScope.modalmessage = message;
+		// Show alert modal window:
+		$rootScope.$broadcast("startalert");
 	}
 	
 	//Function to determine a user's geolocation:
@@ -337,7 +349,8 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 						control._map.locate()*/
 						$scope.getLocation();
 					} else {
-						alert("Bitte loggen Sie sich ein!");
+						//alert("Bitte loggen Sie sich ein!");
+						$rootScope.showAlert("Fehler!","Bitte loggen Sie sich ein!");
 					}
 				}
 			}, {
@@ -368,6 +381,34 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 		//Geolocation using leaflet map object:
 		map.on('locationfound', onLocationFound);
 		map.on('locationerror', onLocationError);
+		
+		//Save button for export of heatmap:
+		$scope.saveButton = L.easyButton({
+			states:[{
+				stateName: 'un_saved',
+				icon: 'fa-floppy-o',
+				title: 'Benutzer orten!',
+				onClick: function(control) {
+					if ($rootScope.username != "" && $rootScope.heatmap_visible == true) {
+						control.state("saving");
+						var date = new Date();
+						$rootScope.heatmap.save($rootScope.school,$rootScope.classname,date,control);
+					} else {
+						//alert("Bitte loggen Sie sich ein!");
+						$rootScope.showAlert("Fehler!","Bitte loggen Sie sich ein!");
+					}
+				}
+			}, {
+				stateName: 'saving',
+				icon: 'fa-spinner fa-spin',
+				title: 'Am Verorten!'
+			}, {
+				stateName: 'error',
+				icon: 'fa-frown-o',
+				title: 'location not found'
+			}]
+		});
+		$scope.saveButton.addTo(map);
 		
 		/*HeatLayer:
 		/*addressPoints = addressPoints.map(function(p) { return [p[0], p[1]] } );
@@ -405,7 +446,8 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 					// Show input dialog
 					$rootScope.$broadcast("startedit", {feature: layer});
 				} else {
-					alert("Please login before adding measurements!")
+					//alert("Please login before adding measurements!")
+					$rootScope.showAlert("Fehler!","Bitte loggen Sie sich ein!");
 				}
 				
 				
@@ -732,11 +774,14 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 			//Leaflet.Heat:
 			//leafletData.getMap().then(function(map){map.panBy([10,10]);map.panBy([-10,-10]);});
 			
+			//Call heatmap measurement function to add data to heatmap for creation of heatmap:
+			if ($rootScope.display_markers == false || $rootScope.updateMarkers.length > 0) {
+				$rootScope.updateHeatmapData($rootScope.measurements);
+			}
+			
 			//after first use -> set $scope.display_markers to true:
 			$rootScope.display_markers = true;
-
-			//Call heatmap measurement function to add data to heatmap for creation of heatmap:
-			$rootScope.updateHeatmapData($rootScope.measurements);
+			
 		});
 		
 		

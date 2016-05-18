@@ -21,10 +21,10 @@ app.controller('loginCtrl', [ '$scope', '$rootScope', '$http',  function($scope,
 				//If username exists in either the teachers or the users table:
 				if (data != "false") {
 					
-					/*First reset all variables:
+					/*First reset all variables if entered username is not the same as the previously logged in user:
 					remove existing markers of the map from a different user,
 					set all "names" to "",...:*/
-					if ($rootScope.username != "") {
+					if ($rootScope.username != "" && $rootScope.username != $scope.user) {
 						$rootScope.marker_array.forEach(function(marker) {
 							$rootScope.editItems.removeLayer(marker);
 							$rootScope.marker_cluster.removeLayer(marker);
@@ -54,24 +54,32 @@ app.controller('loginCtrl', [ '$scope', '$rootScope', '$http',  function($scope,
 						//Save new username in global variable:
 						$rootScope.username = $scope.user;
 						
+						//Split username into different parts and save them in the respective variables -> Part 1 = School, Part 2 = Classname
+						var username_parts = $rootScope.username.split("_");
+						$rootScope.school = username_parts[0];
+						$rootScope.classname = username_parts[1];					
+						
 						//Retrieve potentially existing markers from database:
 						$rootScope.displayMarkers();
 						
 						//Changing the color of the default icon depending on the group:
 						$rootScope.awesomeMarkerIconDefault.options.markerColor = $rootScope.color_array[$rootScope.getGroupnumber($rootScope.username)];
 						
-						alert("Login was successful"); //Error?
+						//alert("Login was successful"); //Error?
+						$rootScope.showAlert("Erfolg!","Der Login war erfolgreich!");
 					}
 					
 				//If the username is neither in teachers nor in users:
 				} else {
-					alert("Username does not exists! You need to register!");
+					//alert("Username does not exists! You need to register!");
+					$rootScope.showAlert("Fehler!","Der eingegebene Benutzername ist nicht registriert!");
 					$scope.loggingin = true;
 					$scope.user = $rootScope.username;
 				}
 			});
 		} else {
-			alert("Please enter a username before logging in!");
+			//alert("Please enter a username before logging in!");
+			$rootScope.showAlert("Achtung!","Bitte geben Sie einen Benutzernamen ein!");
 			$scope.loggingin = true;
 		}
 		

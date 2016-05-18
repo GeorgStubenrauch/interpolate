@@ -143,6 +143,24 @@ img {
 }
 
 
+.alertPopup {   
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  right: 0px;
+  text-align: center;           
+  width: 370px;
+  height: auto;
+  padding: 2px;             
+  font: 12px sans-serif;        
+  background: white;   
+  z-index:30000;  
+  border:  1px;
+  border-color: black; 
+}
+
+
  
 .climateChartDescriptionPopup {   
   position: fixed;

@@ -16,11 +16,13 @@ app.controller('editCtrl', [ '$scope', '$rootScope', '$http',  function($scope, 
 	$scope.save = function() {
 		/*Validation of entered measurements:
 		only values between -30 and +45 are allowed, moreover it is checked if the entered value can be converted to a float value, hence does not contain characters!*/
-		
-		if ($scope.temp.indexOf(",") != -1) {
-			$scope.temp = $scope.temp.replace(",",".");
+		if (typeof $scope.temp != 'undefined') {
+			if ($scope.temp.indexOf(",") != -1) {
+				$scope.temp = $scope.temp.replace(",",".");
+			}
 		}
-		if ($scope.temp >= -30 && $scope.temp <= 45 && isNaN(parseFloat($scope.temp)) == false) {
+		
+		if ($scope.temp >= -30 && $scope.temp <= 45 && isNaN(parseFloat($scope.temp)) == false && typeof $scope.temp != 'undefined') {
 			$scope.editing = false;
 		
 			
@@ -76,26 +78,19 @@ app.controller('editCtrl', [ '$scope', '$rootScope', '$http',  function($scope, 
 				});
 			//Existing markers that are already stored inside the database -> UPDATE
 			} else {
-				$http.get('partials/controllers/saveData.php?USER=' + $rootScope.username + '&LAT=' + latLon.lat + '&LON=' + latLon.lng + '&TEMP=' + $scope.temp + '&EXISTS=true&ID=' + $scope.feature.id ).success(function(data,status) {
-					//console.log("Returned data");
-					//console.log(data);
-					//Add id of marker entry to array:
-					//$rootScope.markers.push(parseInt(data));
-				});
-			
+				$http.get('partials/controllers/saveData.php?USER=' + $rootScope.username + '&LAT=' + latLon.lat + '&LON=' + latLon.lng + '&TEMP=' + $scope.temp + '&EXISTS=true&ID=' + $scope.feature.id ).success(function(data,status) {});
 			}
 		} else {
-			alert("Please enter values between -30°C and 45°C!");
-			$scope.temp = 20;
+			//alert("Please enter values between -30°C and 45°C!");
+			$rootScope.showAlert("Achtung!","Bitte geben Sie Werte zwischen -30°C und +45°C ein!");
+			$scope.temp = "";
 		}	
 	}
 	
 	$scope.deleteMarker = function() {
-		console.log("in deleteMarker()!");
 		$scope.editing = false;
 		//Temperature not yet saved to database:
 		if (typeof $scope.feature.id == "undefined") {
-			console.log("in undefined");
 			//Remove marker object from layer
 			$rootScope.editItems.removeLayer($scope.feature);
 		//Entry already added to database:
@@ -103,7 +98,6 @@ app.controller('editCtrl', [ '$scope', '$rootScope', '$http',  function($scope, 
 			//Remove marker object from map:
 			$rootScope.marker_array.forEach(function(marker) {
 				if (parseInt($scope.feature.id) == parseInt(marker.id)) {
-					console.log("in IF!");
 					$rootScope.editItems.removeLayer(marker);
 					
 					//Remove marker from marker cluster:
@@ -112,10 +106,7 @@ app.controller('editCtrl', [ '$scope', '$rootScope', '$http',  function($scope, 
 					//Remove id from array used to controll addition of markers:
 					var id_index = $rootScope.markers.indexOf($scope.feature.id);
 					if (id_index > -1) {
-						//console.log($rootScope.markers);
-						//console.log(id_index);
 						$rootScope.markers.splice(id_index, 1);
-						//console.log($rootScope.markers);
 						var marker_index = $rootScope.marker_array.indexOf(marker);
 						$rootScope.marker_array.splice(marker_index,1);
 					}
