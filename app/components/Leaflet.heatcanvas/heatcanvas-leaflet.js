@@ -189,6 +189,9 @@ L.TileLayer.HeatCanvas = L.Class.extend({
 		topLeft_coordinates.push(parseInt(topLeft_array[1])-this.delta_y);
 		//console.log("Array topleft: ", topLeft_coordinates[0], topLeft_coordinates[1]);
 		
+		//Get zoom factor to adjust local coordinates of markers:
+		var factor = this.getFactor();
+		
         if (this.data.length > 0) {
             for (var i=0, l=this.data.length; i<l; i++) {
                 var lonlat = new L.LatLng(this.data[i].lat, this.data[i].lon);
@@ -198,8 +201,8 @@ L.TileLayer.HeatCanvas = L.Class.extend({
 				//console.log("x map: ", localXY.x, ", y map: ", localXY.y);
 				var localXY_string = localXY.toString().substring(6,localXY.toString().length-1);
 				var localXY_string_array = localXY_string.split(',');
-				var localXY_x = parseFloat(localXY_string_array[0])-topLeft_coordinates[0];
-				var localXY_y = parseFloat(localXY_string_array[1])-topLeft_coordinates[1];
+				var localXY_x = (parseFloat(localXY_string_array[0])-topLeft_coordinates[0])/factor;
+				var localXY_y = (parseFloat(localXY_string_array[1])-topLeft_coordinates[1])/factor;
 				console.log("x marker: ", localXY_x, ", y marker: ", localXY_y);
                 this.heatmap.push(
                         //Math.floor(localXY.x), 
