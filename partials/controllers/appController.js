@@ -929,6 +929,7 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 	$rootScope.updateHeatmapData = function(measurements) {
 		if ($rootScope.heatmap_visible == true) {
 			$rootScope.heatmap.clear();
+			$rootScope.heatmap.resetValues();
 		}
 		if (measurements.length > 3) {
 			for(var i=0,l=measurements.length; i<l; i++) {

@@ -31,8 +31,8 @@ L.TileLayer.HeatCanvas = L.Class.extend({
         this._onRenderingEnd = null;
 		//this.container;
 		this.canv;
-		//this.deltax_px = 0;
-		//this.deltay_px = 0;
+		this.deltax_px = 0;
+		this.deltay_px = 0;
 		this.mapTopLeftLayerPoints_x_new;
 		this.mapTopLeftLayerPoints_y_new;
 		this.mapTopLeftLayerPoints_x_old;
@@ -187,7 +187,6 @@ L.TileLayer.HeatCanvas = L.Class.extend({
 		var topLeft_coordinates = [];
 		topLeft_coordinates.push(parseInt(topLeft_array[0])-this.delta_x);
 		topLeft_coordinates.push(parseInt(topLeft_array[1])-this.delta_y);
-		//console.log("Array topleft: ", topLeft_coordinates[0], topLeft_coordinates[1]);
 		
 		//Get zoom factor to adjust local coordinates of markers:
 		var factor = this.getFactor();
@@ -203,7 +202,7 @@ L.TileLayer.HeatCanvas = L.Class.extend({
 				var localXY_string_array = localXY_string.split(',');
 				var localXY_x = (parseFloat(localXY_string_array[0])-topLeft_coordinates[0])/factor;
 				var localXY_y = (parseFloat(localXY_string_array[1])-topLeft_coordinates[1])/factor;
-				console.log("x marker: ", localXY_x, ", y marker: ", localXY_y);
+				//console.log("x marker: ", localXY_x, ", y marker: ", localXY_y);
                 this.heatmap.push(
                         //Math.floor(localXY.x), 
                         //Math.floor(localXY.y),
@@ -239,6 +238,15 @@ L.TileLayer.HeatCanvas = L.Class.extend({
 			saveAs(blob, school+"_"+classname+"_"+year.toString()+"_"+month.toString()+"_"+day.toString()+".png");
 		});
 		control.state("un_saved");
+	},
+	
+	resetValues: function() {
+		this.deltax_px = 0;
+		this.deltay_px = 0;
+		this.mapTopLeftLayerPoints_x_new = 0;
+		this.mapTopLeftLayerPoints_y_new = 0;
+		this.mapTopLeftLayerPoints_x_old = 0;
+		this.mapTopLeftLayerPoints_y_old = 0;
 	}
 
 });
