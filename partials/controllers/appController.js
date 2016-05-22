@@ -5,7 +5,7 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 	//Boolean control variables:
 	
 	//to control displaying of modal windows:
-	$scope.editable = true;		//edit modal window
+	$scope.editable = true;		//save- / delete-button in edit modal window
 	$scope.teacher = false;		//register button in login modal window
 	$scope.inclass = false;		//teacher modal window for defintion of class
 	
