@@ -360,7 +360,7 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 			}, {
 				stateName: 'error',
 				icon: 'fa-frown-o',
-				title: 'location not found'
+				title: 'Ort nicht gefunden!'
 			}/*, {
 				stateName: 'unloaded',
 				icon: 'fa-location-arrow',
@@ -387,7 +387,7 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 			states:[{
 				stateName: 'un_saved',
 				icon: 'fa-floppy-o',
-				title: 'Benutzer orten!',
+				title: 'Heatmap speichern!',
 				onClick: function(control) {
 					if ($rootScope.username != "" && $rootScope.heatmap_visible == true) {
 						control.state("saving");
@@ -401,11 +401,11 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 			}, {
 				stateName: 'saving',
 				icon: 'fa-spinner fa-spin',
-				title: 'Am Verorten!'
+				title: 'Am Speichern!'
 			}, {
 				stateName: 'error',
 				icon: 'fa-frown-o',
-				title: 'location not found'
+				title: 'Fehler beim Speichern!'
 			}]
 		});
 		$scope.saveButton.addTo(map);
