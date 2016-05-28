@@ -61,6 +61,12 @@ app.controller('editCtrl', [ '$scope', '$rootScope', '$http',  function($scope, 
 					$rootScope.marker_array.push($scope.feature);
 					//$scope.arrayMarker.push($scope.feature);
 					
+					//Heatcanvas - adding new marker to data:
+					$rootScope.heatmap.pushData(eval(latLon.lat), eval(latLon.lng), parseFloat($scope.temp), parseInt($scope.feature.id));
+					//Add marker to marker cluster needed to get bounds for canvas:
+					$rootScope.heatmap.markerCluster.addLayer($scope.feature);
+					$rootScope.heatmap.redraw();
+					
 					/*Leaflet.Heat:
 					--------Speichern der Werte LAT LONG und TEMP in einem Array-------------------------
 
@@ -78,7 +84,11 @@ app.controller('editCtrl', [ '$scope', '$rootScope', '$http',  function($scope, 
 				});
 			//Existing markers that are already stored inside the database -> UPDATE
 			} else {
-				$http.get('partials/controllers/saveData.php?USER=' + $rootScope.username + '&LAT=' + latLon.lat + '&LON=' + latLon.lng + '&TEMP=' + $scope.temp + '&EXISTS=true&ID=' + $scope.feature.id ).success(function(data,status) {});
+				$http.get('partials/controllers/saveData.php?USER=' + $rootScope.username + '&LAT=' + latLon.lat + '&LON=' + latLon.lng + '&TEMP=' + $scope.temp + '&EXISTS=true&ID=' + $scope.feature.id ).success(function(data,status) {
+					//Update value in heatmap array:
+					$rootScope.heatmap.updateValue(parseInt($scope.feature.id),parseFloat($scope.temp));
+					$rootScope.heatmap.redraw();
+				});
 			}
 		} else {
 			//alert("Please enter values between -30°C and 45°C!");
@@ -109,6 +119,11 @@ app.controller('editCtrl', [ '$scope', '$rootScope', '$http',  function($scope, 
 						$rootScope.markers.splice(id_index, 1);
 						var marker_index = $rootScope.marker_array.indexOf(marker);
 						$rootScope.marker_array.splice(marker_index,1);
+						
+						//Remove marker from marker_cluster:
+						$rootScope.heatmap.markerCluster.removeLayer(marker);
+						$rootScope.heatmap.deleteValue($scope.feature.id);
+						$rootScope.heatmap.redraw();
 					}
 					//Remove entry from database:
 					$http.get('partials/controllers/deleteData.php?ID=' + $scope.feature.id).success(function(data,status) {});

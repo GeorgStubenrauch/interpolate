@@ -81,7 +81,8 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 			case "default": return L.ExtraMarkers.icon({
 									icon: 'fa-number',
 									number: Math.round(parseFloat(temp)),	//conversion to float and then rounding to next integer value
-									markerColor: $rootScope.color_array[groupnumber]});
+									markerColor: $rootScope.color_array[groupnumber]
+							});
 							break;
 			
 			//otherUser = markers of other groups:
@@ -96,9 +97,10 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 			case "updating":	return L.ExtraMarkers.icon({
 									icon: 'fa-spinner',
 									shape: 'penta',
-									markerColor: 'green',
+									markerColor: $rootScope.color_array[groupnumber],
 									prefix: 'fa',
-									extraClasses: 'fa-spin'});
+									extraClasses: 'fa-spin'
+								});
 								break;
 			
 			//updated = markers that were updated by other group since last update
@@ -106,7 +108,8 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 									icon: 'fa-number',
 									shape: 'penta',
 									number: Math.round(parseFloat(temp)),
-									markerColor: 'green'});
+									markerColor: $rootScope.color_array[groupnumber]
+							});
 							break;
 							
 			default:	return L.ExtraMarkers.icon({
@@ -716,7 +719,7 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 					$rootScope.marker_array.push(marker);
 					
 					//Adding measurement data for interpolation:
-					var this_measurement = new Array(eval(feature.geometry.coordinates[0]), eval(feature.geometry.coordinates[1]), parseFloat(feature.properties.temp));
+					var this_measurement = new Array(eval(feature.geometry.coordinates[0]), eval(feature.geometry.coordinates[1]), parseFloat(feature.properties.temp), parseInt(feature.properties.id));
 					$rootScope.measurements.push(this_measurement);
 					
 					//Add marker to marker_cluster object, used to get bounds from markers:
@@ -790,140 +793,18 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 	$scope.show = function() {
 		console.log("Clicked Login");
 		$rootScope.$broadcast("startlogin");
-	}	
-	
-	//Canvas Overlay part:
-	
-	//necessary functions:
-	/*$scope.drawingOnCanvas = function(canvasOverlay, params) {
-		//kriging variogram calculation
-			//data
-			var t = [21, 30, 15, 15];
-	        var x = [49.005, 49.015, 49.005, 49.015];
-	        var y = [8.335, 8.355, 8.355, 8.335];
-
-	        //modelsetup
-	        /*var model = "exponential";
-		    var sigma2 = 0.1, alpha = 1;
-		    var variogram = kriging.train(t, x, y, model, sigma2, alpha);*/
-
-      /*  var ctx = params.canvas.getContext('2d');
-        console.log("width of the canvas: " + params.canvas.width + " height of the canvas: " + params.canvas.height);
-        ctx.clearRect(0, 0, params.canvas.width, params.canvas.height);
-    //    ctx.fillStyle = "rgba(255,116,0, 0.2)";
-    	console.log("Bounds:", params.bounds.toString());
-
-    	var x_len_deg = (params.bounds._northEast.lng - params.bounds._southWest.lng);//canvas x length in degree
-    	var y_len_deg = (params.bounds._northEast.lat - params.bounds._southWest.lat);//canvas y length in degree
-    	var x_len_px = params.canvas.width;//canvas x length in pixel
-    	var y_len_px = params.canvas.height;//canvas y length in pixel
-
-    	var x_factor = x_len_deg / x_len_px;//degree of one pixel in x
-    	var y_factor = y_len_deg / y_len_px;//degree of one pixel in y
-    	
-
-    	//min max values of the drawn rectangular
-		var x_min = 7.335,
-			y_min = 48.005,
-			x_max = 8.355,
-			y_max = 49.015;
-
-		var x_offset = (x_min - params.bounds._southWest.lng) / x_factor;//in pixel
-		var y_offset = (y_min - params.bounds._northEast.lat) / y_factor;//in pixel
-		x_offset = Math.abs(x_offset);//avoid negative offsets
-		y_offset = Math.abs(y_offset);//avoid negative offsets
-		
-		console.log("potatoe " + $rootScope.map.getZoom());
-
-		x_factor = x_factor * $rootScope.map.getZoom();
-    	y_factor = y_factor * $rootScope.map.getZoom();
-		
-		var can_x = (x_max - x_min) / x_factor;//rectangular size in pixel
-		var can_y = (y_max - y_min) / y_factor;//rectangular size in pixel
-
-		can_x = can_x + x_offset;//add the offset of the canvas
-		can_y = can_y + y_offset;//add the offset of the canvas
-
-//		var cellsX = (aWidth/idwcells.width)|0;
-		var test = (x_min >= params.bounds._southWest.lng ) &&
-			(x_max <= params.bounds._northEast.lng ) &&
-			(y_min >= params.bounds._southWest.lat ) &&
-			(y_max <= params.bounds._northEast.lat );
-
-		console.log(params.bounds, x_min,y_min, x_max, y_max, test);
-
-		if (
-			(x_min >= params.bounds._southWest.lng ) &&
-			(x_max <= params.bounds._northEast.lng ) &&
-			(y_min >= params.bounds._southWest.lat ) &&
-			(y_max <= params.bounds._northEast.lat ) ) {
-
-	//	if(params.bounds.intersects([[x_min, y_min], [x_max, y_max]])){
-
-			for (var i = x_offset; i < can_x; i += $rootScope.map.getZoom()) {
-			    for ( var j = y_offset; j < can_y; j += $rootScope.map.getZoom()) {
-			    	//calculate the current position in lat / lng
-			    	var x_offset_deg = x_offset * x_factor;//offset in degree == (x_min - params.bounds._southWest.lng)
-			    	var y_offset_deg = y_offset * y_factor;//offset in degree == (x_min - params.bounds._southWest.lng)
-			    	var lng =  x_offset_deg + i * x_factor;
-			    	var lat = y_offset_deg + j * y_factor;
-			    	console.log("lat: " + lat + " lon: " + lng);
-
-			    	//var value = predict_point(lng, lat, variogram);//->store the value at position in value
-			    	//console.log(value);
-
-			    	var randomm = parseInt(Math.random() * 255);
-
-			    	var color = rgbToHex(randomm, randomm, randomm);//convert an rgb value to a hex value
-				    ctx.fillStyle=color;//set the color of the rectangular
-					console.log(i,j);
-					ctx.fillRect(i,j,10,10);//draw a rectangular on canvas with height and width 1 pixel
-				}
-			}
-		}
-    };
-
-    function componentToHex(c) {
-	    var hex = c.toString(16);
-	    return hex.length == 1 ? "0" + hex : hex;
 	}
-
-	function rgbToHex(r, g, b) {
-	    return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
-	}
-
-	//predict value with kriging for this specific point (x, y); variogram is calculated on the top
-	/*function predict_point(x, y, variogram) {
-		var i, k = Array(variogram.n);
-		for(i=0;i<variogram.n;i++)
-		    k[i] = variogram.model(Math.pow(Math.pow(x-variogram.x[i], 2)+
-				   Math.pow(y-variogram.y[i], 2), 0.5),
-				   variogram.nugget, variogram.range, 
-				   variogram.sill, variogram.A);
-		return matrix_multiply(k, variogram.M, 1, variogram.n, 1)[0];
-	};*/
-
-	/*function matrix_multiply(X, Y, n, m, p) {
-		var i, j, k, Z = Array(n*p);
-		for(i=0;i<n;i++) {
-		    for(j=0;j<p;j++) {
-			Z[i*p+j] = 0;
-			for(k=0;k<m;k++)
-			    Z[i*p+j] += X[i*m+k]*Y[k*p+j];
-		    }
-		}
-		return Z;
-	}*/
 	
-	//Canvas:
-	/*leafletData.getMap().then(function(map) {
-		if (typeof map != 'undefined'){
-			$rootScope.map = map;
-			new L.canvasOverlay()
-		            .drawing($scope.drawingOnCanvas)
-		            .addTo(map);
-	    }
-	});*/
+	//Get kriging.js file only after initialization of the map object:
+	$http.get('app/components/kriging/kriging.js').then(function(data,status) {
+		// Adding the script tag to the head as suggested before
+		var script = document.createElement('script');
+		script.type = 'text/javascript';
+		script.src = data.config.url;
+		document.getElementById('head').appendChild(script);
+
+	});
+	
 	//Heatcanvas try:
 	//Definition of a global function, this way it can be called inside the interpolate-module
 	$rootScope.updateHeatmapData = function(measurements) {
@@ -933,7 +814,7 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 		}
 		if (measurements.length > 3) {
 			for(var i=0,l=measurements.length; i<l; i++) {
-                $rootScope.heatmap.pushData(measurements[i][0], measurements[i][1], measurements[i][2]);
+                $rootScope.heatmap.pushData(measurements[i][0], measurements[i][1], measurements[i][2], measurements[i][3]);
             }
 			/*leafletData.getLayers().then(function(baselayers) {
 				console.log($rootScope.marker_cluster.getBounds());
@@ -956,7 +837,7 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 	//Leaflet.heatcanvas:
 	$rootScope.heatmap = new
                 L.TileLayer.HeatCanvas({},{'step':0.5,
-                'degree':HeatCanvas.CUBIC, 'opacity':0.7},$rootScope.marker_cluster);
+                'degree':HeatCanvas.LINEAR, 'opacity':0.7},$rootScope.marker_cluster);
 	
 	
 	/*if ($rootScope.measurements.length > 0) {
