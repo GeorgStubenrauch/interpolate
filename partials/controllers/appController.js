@@ -778,10 +778,20 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 			//leafletData.getMap().then(function(map){map.panBy([10,10]);map.panBy([-10,-10]);});
 			
 			//Call heatmap measurement function to add data to heatmap for creation of heatmap:
-			if ($rootScope.display_markers == false || $rootScope.updateMarkers.length > 0) {
-				$rootScope.updateHeatmapData($rootScope.measurements);
+			if ($rootScope.display_markers == false) {
+				if ($rootScope.measurements.length > 4 && $rootScope.heatmap_visible == false) {
+					$rootScope.drawHeatmap($rootScope.measurements);
+				} else {
+					if ($rootScope.heatmap_visible == true && $rootScope.measurements.length > 4) {
+						$rootScope.drawHeatmap($rootScope.measurements);
+					} else {
+						$rootScope.heatmap_visible == false;
+						leafletData.getMap().then(function(map) {
+							map.removeLayer($rootScope.heatmap);
+						});
+					}
+				}
 			}
-			
 			//after first use -> set $scope.display_markers to true:
 			$rootScope.display_markers = true;
 			
@@ -807,18 +817,10 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 	
 	//Heatcanvas try:
 	//Definition of a global function, this way it can be called inside the interpolate-module
-	$rootScope.updateHeatmapData = function(measurements) {
-		if ($rootScope.heatmap_visible == true) {
-			$rootScope.heatmap.clear();
-			$rootScope.heatmap.resetValues();
-		}
-		if (measurements.length > 3) {
+	$rootScope.drawHeatmap = function(measurements) {
 			for(var i=0,l=measurements.length; i<l; i++) {
                 $rootScope.heatmap.pushData(measurements[i][0], measurements[i][1], measurements[i][2], measurements[i][3]);
             }
-			/*leafletData.getLayers().then(function(baselayers) {
-				console.log($rootScope.marker_cluster.getBounds());
-			});*/
 			if ($rootScope.heatmap_visible == false) {
 				leafletData.getMap().then(function(map) {
 					$rootScope.heatmap.addTo(map);
@@ -828,31 +830,13 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 					//console.log("Marker bounds: ", $rootScope.marker_cluster);
 				});	
 				$rootScope.heatmap_visible = true;
+				console.log("Array length: ",$rootScope.heatmap.data.length);
 			} else {
 				$rootScope.heatmap.redraw();
 			}
-		}
 	}
 	
 	//Leaflet.heatcanvas:
-	$rootScope.heatmap = new
-                L.TileLayer.HeatCanvas({},{'step':0.5,
-                'degree':HeatCanvas.LINEAR, 'opacity':0.7},$rootScope.marker_cluster);
-	
-	
-	/*if ($rootScope.measurements.length > 0) {
-		!$scope.display_heatcanvas;*/
-	//$rootScope.heatmap.addTo($rootScope.map);
-	//}
-				
-    /*heatmap.onRenderingStart(function(){
-		document.getElementById("status").innerHTML = 'rendering';  
-    });
-	
-    heatmap.onRenderingEnd(function(){
-        document.getElementById("status").innerHTML = '';  
-    });*/
-	
-	//$rootScope.displayMarkers();
+	$rootScope.heatmap = new L.TileLayer.HeatCanvas({},{'step':0.5,'degree':HeatCanvas.LINEAR, 'opacity':0.7},$rootScope.marker_cluster);
 
 } ]);

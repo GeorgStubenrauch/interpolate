@@ -1,4 +1,4 @@
-app.controller('loginCtrl', [ '$scope', '$rootScope', '$http',  function($scope, $rootScope, $http) {
+app.controller('loginCtrl', [ '$scope', '$rootScope', 'leafletData','$http',  function($scope, $rootScope, leafletData, $http) {
 	//Check code for login. Problem when changing user with the creation of markers? Implement logoff-function?
 	console.log("loginController is OK");
 	
@@ -28,6 +28,9 @@ app.controller('loginCtrl', [ '$scope', '$rootScope', '$http',  function($scope,
 						$rootScope.marker_array.forEach(function(marker) {
 							$rootScope.editItems.removeLayer(marker);
 							$rootScope.marker_cluster.removeLayer(marker);
+							
+							//"delete" entry from heatmap array:
+							$rootScope.heatmap.deleteValue(marker.id);
 						});
 						$rootScope.markers = [];
 						$rootScope.markers.length = 0;
@@ -36,6 +39,17 @@ app.controller('loginCtrl', [ '$scope', '$rootScope', '$http',  function($scope,
 						$rootScope.classname = "";			//Classname "reset"
 						$rootScope.teachername = "";		//teachername "reset" if new user is no teacher!
 						$rootScope.username = "";
+						
+						//if heatmap is displayed, clear it:
+						/*if ($rootScope.heatmap_visible == true) {
+							leafletData.getMap().then(function(map) {
+								map.removeLayer($rootScope.heatmap);
+							});
+							$rootScope.heatmap_visible = false;*
+						}*/
+						
+						$rootScope.measurements = [];
+						$rootScope.measurements.length = 0;
 					}
 					//Save id of user, which is only not equal to 0 if the user is a teacher:
 					$rootScope.user_id = data;

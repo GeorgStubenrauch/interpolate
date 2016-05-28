@@ -62,10 +62,18 @@ app.controller('editCtrl', [ '$scope', '$rootScope', '$http',  function($scope, 
 					//$scope.arrayMarker.push($scope.feature);
 					
 					//Heatcanvas - adding new marker to data:
-					$rootScope.heatmap.pushData(eval(latLon.lat), eval(latLon.lng), parseFloat($scope.temp), parseInt($scope.feature.id));
-					//Add marker to marker cluster needed to get bounds for canvas:
-					$rootScope.heatmap.markerCluster.addLayer($scope.feature);
-					$rootScope.heatmap.redraw();
+					if ($rootScope.heatmap_visible == true) {
+						$rootScope.heatmap.pushData(eval(latLon.lat), eval(latLon.lng), parseFloat($scope.temp), parseInt($scope.feature.id));
+						//Add marker to marker cluster needed to get bounds for canvas:
+						$rootScope.heatmap.markerCluster.addLayer($scope.feature);
+						$rootScope.heatmap.redraw();
+					} else {
+						$rootScope.measurements.push(eval(latLon.lat), eval(latLon.lng), parseFloat($scope.temp), parseInt($scope.feature.id));
+						if ($rootScope.measurements.length > 4) {
+							$rootScope.drawHeatmap($rootScope.measurements);
+						}
+					}
+					
 					
 					/*Leaflet.Heat:
 					--------Speichern der Werte LAT LONG und TEMP in einem Array-------------------------

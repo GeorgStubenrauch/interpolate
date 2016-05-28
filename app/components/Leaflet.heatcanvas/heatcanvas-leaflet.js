@@ -80,8 +80,12 @@ L.TileLayer.HeatCanvas = L.Class.extend({
 		var map_height_px = this.map.getSize().y;
 		var map_width_deg = this.map.getBounds().getNorthEast().lng - this.map.getBounds().getSouthWest().lng;
 		var map_height_deg =  this.map.getBounds().getNorthEast().lat -  this.map.getBounds().getSouthWest().lat;
+		
+		//Get marker width/height in degree, needed for calculation of canvas width/heigt:
 		var marker_width_deg = bounds.getNorthEast().lng - bounds.getSouthWest().lng;
 		var marker_height_deg = bounds.getNorthEast().lat - bounds.getSouthWest().lat;
+		
+		
 		var factor = this.getFactor();
 		container.style.width = ((map_width_px/map_width_deg)*marker_width_deg)*factor+"px";
         container.style.height = ((map_height_px/map_height_deg)*marker_height_deg)*factor+"px";
@@ -108,6 +112,7 @@ L.TileLayer.HeatCanvas = L.Class.extend({
 		//Get map bounds and convert them to Layer Points:
 		var bounds = this.map.getBounds();
         var topLeft = this.map.latLngToLayerPoint(bounds.getNorthWest());
+		
 		var topLeft_string = topLeft.toString().substring(6,topLeft.toString().length-1);
 		var topLeft_array = topLeft_string.split(',');
 		this.mapTopLeftLayerPoints_x_new = parseInt(topLeft_array[0]);
@@ -151,17 +156,27 @@ L.TileLayer.HeatCanvas = L.Class.extend({
 		var marker_width_deg = bounds.getNorthEast().lng - bounds.getSouthWest().lng;
 		var marker_height_deg = bounds.getNorthEast().lat - bounds.getSouthWest().lat;
 		
+		//get delta values for height/width of marker bounds:
+		var delta_width_deg = marker_width_deg - this.marker_width_deg_old;
+		var delta_height_deg = marker_height_deg - this.marker_height_deg_old;
+		//console.log("Delta width: ", delta_width_deg, ", in px: ", ((map_width_px/map_width_deg)*delta_width_deg)*factor+"px",", Delta height: ", delta_height_deg, ", in px: ", ((map_height_px/map_height_deg)*delta_height_deg)*factor+"px");
 		
+		//Calculation of canvas height / width:
 		this._div.style.width = ((map_width_px/map_width_deg)*marker_width_deg)*factor+"px";
         this._div.style.height = ((map_height_px/map_height_deg)*marker_height_deg)*factor+"px";
 		this.canv.width = (map_width_px/map_width_deg)*marker_width_deg;
         this.canv.height = (map_height_px/map_height_deg)*marker_height_deg;
+		
         this.canv.style.width = (this.canv.width*factor)+"px";
         this.canv.style.height = (this.canv.height*factor)+"px";
         this.canv.style.opacity = this._opacity;
 		
+		//Setting the latest height/width value to the heatmap object, needed for the drawing of the heatmap:
+		this.heatmap.width = this.canv.width / factor;
+		this.heatmap.height = this.canv.height / factor;
+		
 		//console.log(map_width_deg,map_height_deg,marker_width_deg,marker_height_deg);
-		//console.log(map_width_px,map_height_px,this.canv.style.width,this.canv.style.height);
+		console.log(map_width_px,map_height_px,this.canv.style.width,this.canv.style.height);
         L.DomUtil.setPosition(this._div, topLeft);
     },
 
@@ -199,6 +214,7 @@ L.TileLayer.HeatCanvas = L.Class.extend({
 		
         if (this.data.length > 0) {
             for (var i=0, l=this.data.length; i<l; i++) {
+				console.log(this.data[i].mid, ", ", this.data[i].v);
 				if (this.data[i].v < parseFloat(999)){
 					var lonlat = new L.LatLng(this.data[i].lat, this.data[i].lon);
 					var localXY = this.map.latLngToLayerPoint(lonlat);
