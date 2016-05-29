@@ -43,6 +43,9 @@ var HeatCanvas = function(canvas){
     this.onRenderingEnd = null;
     
     this.data = {};
+	this.x = [];
+	this.y = [];
+	this.v = [];
 };
 
 HeatCanvas.prototype.resize = function( w, h ) {
@@ -54,7 +57,8 @@ HeatCanvas.prototype.resize = function( w, h ) {
 };
 
 HeatCanvas.prototype.push = function(x, y, data){
-    // ignore all data out of extent
+	//console.log("x: ", x, ", y: ", y, ", data: ", data);
+    // ignore all data out of extent - not properly working due to changes by implementing marker bounds
     if (x < 0 || x > this.width) {
         return ;
     }
@@ -68,6 +72,12 @@ HeatCanvas.prototype.push = function(x, y, data){
     } else {
         this.data[id] = data;
     }
+	
+	//Test:
+	this.x.push(x);
+	this.y.push(y);
+	this.v.push(data);
+	//console.log(this.data);
 };
 
 HeatCanvas.prototype.render = function(step, degree, f_value_color){
@@ -75,6 +85,9 @@ HeatCanvas.prototype.render = function(step, degree, f_value_color){
     degree = degree || HeatCanvas.LINEAR ;
 
     var self = this;
+	var x = this.x;
+	var y = this.y;
+	var v = this.v
     this.worker.onmessage = function(e){
         self.value = e.data.value;
         self.data = {};
@@ -89,8 +102,12 @@ HeatCanvas.prototype.render = function(step, degree, f_value_color){
         'height': self.height,
         'step': step,
         'degree': degree,
-        'value': self.value
+        'value': self.value,
+		'x': self.x,
+		'y': self.y,
+		'v': self.v
     };
+	
     this.worker.postMessage(msg);
     if (this.onRenderingStart){
         this.onRenderingStart();
@@ -118,7 +135,7 @@ HeatCanvas.prototype._render = function(f_value_color){
     for(var id in this.value){
         maxValue = Math.max(this.value[id], maxValue);
     }
-    
+	
     for(var pos in this.value){
         var x = Math.floor(pos%this.width);
         var y = Math.floor(pos/this.width);
@@ -126,14 +143,14 @@ HeatCanvas.prototype._render = function(f_value_color){
         // MDC ImageData:
         // data = [r1, g1, b1, a1, r2, g2, b2, a2 ...]
         var pixelColorIndex = y*this.width*4+x*4;
-        
-        var color = HeatCanvas.hsla2rgba.apply(
-          null, f_value_color(this.value[pos] / maxValue));
+			
+		var color = HeatCanvas.hsla2rgba.apply(null, f_value_color(this.value[pos] / (maxValue)));
+		
         canvasData.data[pixelColorIndex] = color[0]; //r
         canvasData.data[pixelColorIndex+1] = color[1]; //g
         canvasData.data[pixelColorIndex+2] = color[2]; //b
         canvasData.data[pixelColorIndex+3] = color[3]; //a
-        }
+    }
 
     ctx.putImageData(canvasData, 0, 0);
     
@@ -142,6 +159,11 @@ HeatCanvas.prototype._render = function(f_value_color){
 HeatCanvas.prototype.clear = function(){
     this.data = {};
     this.value = {};
+	
+	//Test:
+	this.x = [];
+	this.y = [];
+	this.v = [];
 	
     this.canvas.getContext("2d").clearRect(0, 0, this.width, this.height);
 };

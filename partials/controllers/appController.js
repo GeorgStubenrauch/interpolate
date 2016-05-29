@@ -837,6 +837,6 @@ app.controller('appController', [ '$scope', '$rootScope', '$http', 'leafletData'
 	}
 	
 	//Leaflet.heatcanvas:
-	$rootScope.heatmap = new L.TileLayer.HeatCanvas({},{'step':0.5,'degree':HeatCanvas.LINEAR, 'opacity':0.7},$rootScope.marker_cluster);
+	$rootScope.heatmap = new L.TileLayer.HeatCanvas({},{'step':0.5,'degree':HeatCanvas.QUAD, 'opacity':0.7},$rootScope.marker_cluster);
 
 } ]);
