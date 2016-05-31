@@ -19,7 +19,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+/*
+Edited by Georg Stubenrauch while working on a study project:
+aims:
+- change creation of canvas, instead of map bounds -> marker cluster bounds are used!
+- two "real" interpolation methods were implemented - IDW and Kriging (using Kriging.js)
+- exportPNG function added to export canvas as PNG (using FileSaver.js)
 
+known problems:
+- performance not that great since values are interpolated for all single cells
+- canvas is redrawn completely with every pan-event, e.g. change to only move canvas instead of redraw
+- deletion of values in data array caused problems, workaround used: deleted values changed to 999.0 and caught with if-clause, should be changed!
+
+additional information:
+this library and the respective functions call functions from heatcanvas.js, contains different important methods, e.g. push, interpolate, ...
+heatcanvas-worker.js was changed drastically, is called within heatcanvas.js, now there are no major calculations done anymore, 
+only the calculation of the ID, everything else is done in both former libraries!
+
+additonal needed and open source libraries:
+-FileSaver.js
+-kriging.js
+*/
 L.TileLayer.HeatCanvas = L.Class.extend({
 
     initialize: function(options, heatCanvasOptions,markerCluster){
@@ -31,15 +51,17 @@ L.TileLayer.HeatCanvas = L.Class.extend({
         this._onRenderingEnd = null;
 		//this.container;
 		this.canv;
-		this.deltax_px = 0;
-		this.deltay_px = 0;
-		this.mapTopLeftLayerPoints_x_new;
-		this.mapTopLeftLayerPoints_y_new;
-		this.mapTopLeftLayerPoints_x_old;
-		this.mapTopLeftLayerPoints_y_old;
-		this.x = [];
-		this.y = [];
-		this.v = [];
+		this.deltax_px = 0;					//difference between topLeft x-coordinates as pixel value
+		this.deltay_px = 0;					//difference between topLeft y-coordinates as pixel value
+		this.mapTopLeftLayerPoints_x_new;	//new topLeft x-coordinate as pixel value (used to calculate deltax_px)
+		this.mapTopLeftLayerPoints_y_new;	//new topLeft y-coordinate as pixel value (used to calculate deltax_py)
+		this.mapTopLeftLayerPoints_x_old;	//old topLeft x-coordinate as pixel value (used to calculate deltax_px)
+		this.mapTopLeftLayerPoints_y_old;	//old topLeft y-coordinate as pixel value (used to calculate deltax_py)
+		this.x = [];						//array for x-coordinates
+		this.y = [];						//array for y-coordinates
+		this.v = [];						//array for (temperature-)values
+		this.factor;						//(Zoom-)factor needed for scaling/drawing of canvas calculated using getFactor-function
+		this.interpolation_method = "Kriging";	//interpolation method, default: "Kriging"
     },
 
     onRenderingStart: function(cb){
@@ -66,7 +88,8 @@ L.TileLayer.HeatCanvas = L.Class.extend({
 		var container = L.DomUtil.get('leaflet-heatmap-container');
 		var bounds = this.markerCluster.getBounds();
 	},
-
+	
+	//initialization of canvas, getting map and marker_cluster bounds, calculating pixel width/height and (topLeft-)position of canvas for drawing:
     _initHeatCanvas: function(map, options){
         options = options || {};                        
         this._step = options.step || 1;
@@ -77,8 +100,6 @@ L.TileLayer.HeatCanvas = L.Class.extend({
 		console.log("Bounds init: ",bounds);
         var container = L.DomUtil.create('div', 'leaflet-heatmap-container');
         container.style.position = 'absolute';
-        //container.style.width = this.map.getSize().x+"px";
-        //container.style.height = this.map.getSize().y+"px";
 		var map_width_px = this.map.getSize().x;
 		var map_height_px = this.map.getSize().y;
 		var map_width_deg = this.map.getBounds().getNorthEast().lng - this.map.getBounds().getSouthWest().lng;
@@ -88,16 +109,13 @@ L.TileLayer.HeatCanvas = L.Class.extend({
 		var marker_width_deg = bounds.getNorthEast().lng - bounds.getSouthWest().lng;
 		var marker_height_deg = bounds.getNorthEast().lat - bounds.getSouthWest().lat;
 		
-		
+		//Factor to adjust canvas size when user zooms:
 		var factor = this.getFactor();
+		this.factor = factor;
 		container.style.width = ((map_width_px/map_width_deg)*marker_width_deg)*factor+"px";
         container.style.height = ((map_height_px/map_height_deg)*marker_height_deg)*factor+"px";
-		//console.log(map_width_deg,map_height_deg,marker_width_deg,marker_height_deg);
-		//console.log(map_width_px,map_height_px,container.style.width,container.style.height);
 		
         this.canv = document.createElement("canvas");
-        //canv.width = this.map.getSize().x;
-        //canv.height = this.map.getSize().y;
 		this.canv.width = (map_width_px/map_width_deg)*marker_width_deg;
         this.canv.height = (map_height_px/map_height_deg)*marker_height_deg;
         this.canv.style.width = (this.canv.width*factor)+"px";
@@ -123,7 +141,8 @@ L.TileLayer.HeatCanvas = L.Class.extend({
 		this.mapTopLeftLayerPoints_x_old = parseInt(topLeft_array[0]);
 		this.mapTopLeftLayerPoints_y_old = parseInt(topLeft_array[1]);
     },
-
+	
+	//Save measurements (coordinates and value) in array data as JSON:
     pushData: function(lat, lon, value, mid) {
         this.data.push({"lat":lat, "lon":lon, "v":value, "mid":mid});
     },
@@ -133,6 +152,7 @@ L.TileLayer.HeatCanvas = L.Class.extend({
         return this;
     },
 	
+	//"Reset"/Change canvas position: - not fixed that only position is changed once it is panned, instead of redrawing!
     _resetCanvasPosition: function() {
 		
 		//Old:
@@ -150,7 +170,6 @@ L.TileLayer.HeatCanvas = L.Class.extend({
 		this.mapTopLeftLayerPoints_x_new = parseInt(topLeft_map_array[0]);
 		this.mapTopLeftLayerPoints_y_new = parseInt(topLeft_map_array[1]);
 		
-		/*Test:*/
 		var factor = this.getFactor();
 		var map_width_px = this.map.getSize().x;
 		var map_height_px = this.map.getSize().y;
@@ -172,8 +191,6 @@ L.TileLayer.HeatCanvas = L.Class.extend({
 		this.heatmap.width = this.canv.width / factor;
 		this.heatmap.height = this.canv.height / factor;
 		
-		//console.log(map_width_deg,map_height_deg,marker_width_deg,marker_height_deg);
-		console.log(map_width_px,map_height_px,this.canv.style.width,this.canv.style.height);
         L.DomUtil.setPosition(this._div, topLeft);
     },
 
@@ -181,17 +198,6 @@ L.TileLayer.HeatCanvas = L.Class.extend({
 		
         this._resetCanvasPosition();
         this.heatmap.clear();
-		//console.log("Redraw - this.canv: ", this.canv);
-		//console.log("Data: ", this.data);
-		//Get container data to calculate the factor for canvas:
-		/*var bounds = this.markerCluster.getBounds();
-		var factor = this.getFactor();
-		var map_width_px = this.map.getSize().x;
-		var map_height_px = this.map.getSize().y;
-		var map_width_deg = this.map.getBounds().getNorthEast().lng - this.map.getBounds().getSouthWest().lng;
-		var map_height_deg =  this.map.getBounds().getNorthEast().lat -  this.map.getBounds().getSouthWest().lat;
-		var marker_width_deg = bounds.getNorthEast().lng - bounds.getSouthWest().lng;
-		var marker_height_deg = bounds.getNorthEast().lat - bounds.getSouthWest().lat;*/
 		
 		//Calculate delta_x and delta_y by comparing the old and new values of the topLeft map values:
 		this.delta_x = this.mapTopLeftLayerPoints_x_new - this.mapTopLeftLayerPoints_x_old;
@@ -208,7 +214,6 @@ L.TileLayer.HeatCanvas = L.Class.extend({
 		
 		//Get zoom factor to adjust local coordinates of markers:
 		var factor = this.getFactor();
-		
         if (this.data.length > 0) {
             for (var i=0, l=this.data.length; i<l; i++) {
 				//console.log(this.data[i].mid, ", ", this.data[i].v);
@@ -216,13 +221,11 @@ L.TileLayer.HeatCanvas = L.Class.extend({
 					var lonlat = new L.LatLng(this.data[i].lat, this.data[i].lon);
 					var localXY = this.map.latLngToLayerPoint(lonlat);
 					localXY = this.map.layerPointToContainerPoint(localXY);
-					
-					//console.log("x map: ", localXY.x, ", y map: ", localXY.y);
+
 					var localXY_string = localXY.toString().substring(6,localXY.toString().length-1);
 					var localXY_string_array = localXY_string.split(',');
 					var localXY_x = (parseFloat(localXY_string_array[0])-topLeft_coordinates[0])/factor;
 					var localXY_y = (parseFloat(localXY_string_array[1])-topLeft_coordinates[1])/factor;
-					//console.log("x marker: ", localXY_x, ", y marker: ", localXY_y);
 					this.heatmap.push(
 							//Math.floor(localXY.x), 
 							//Math.floor(localXY.y),
@@ -231,7 +234,9 @@ L.TileLayer.HeatCanvas = L.Class.extend({
 							this.data[i].v);
 				}
             }
-			//console.log("Data: ", this.data);
+			//After storing all measurements properly, the values for the canvas can be interpolated using the given/chosen method:
+			this.heatmap.interpolate(this.interpolation_method);
+			//After interpolation the canvas can be drawn:
             this.heatmap.render(this._step, this._degree, this._colorscheme);
         }
         return this;
@@ -246,21 +251,27 @@ L.TileLayer.HeatCanvas = L.Class.extend({
         this._redraw();
     },
 	
+	//Get Zoom level and calculate factor needed for scaling of canvas width/height:
 	getFactor: function() {
 		var zoom = this.map.getZoom();
 		return Math.pow(2,(zoom-8));
 	},
 	
-	save: function(school,classname,date,control) {
+	//Export canvas with heatmap as PNG using FileSaver.js
+	exportPNG: function(school,classname,interpolation_method,date,control) {
+		//day, month, year calculated from Date object
 		var year = date.getFullYear();
 		var month = date.getMonth() + 1;
 		var day = date.getDate();
+		//Getting blob object using toBlob() method of canv object:
 		this.canv.toBlob(function(blob) {
-			saveAs(blob, school+"_"+classname+"_"+year.toString()+"_"+month.toString()+"_"+day.toString()+".png");
+			//Saving canvas as PNG with FileSaver.js function saveAs:
+			saveAs(blob, school+"_"+classname+"_"+interpolation_method+"_"+year.toString()+"_"+month.toString()+"_"+day.toString()+".png");
 		});
 		control.state("un_saved");
 	},
 	
+	//Function to update (temperature-)values to keep data uptodate:
 	updateValue: function(mid,temp) {
 		this.data.forEach(function(data_entry) {
 			if (data_entry.mid == mid) {
@@ -269,6 +280,7 @@ L.TileLayer.HeatCanvas = L.Class.extend({
 		});
 	},
 	
+	//Deletion caused problems -> change values to 999.0 -> caught with if-clause as "deleted" (should be changed):
 	deleteValue: function(mid) {
 		this.data.forEach(function(data_entry) {
 			if (data_entry.mid == mid) {
@@ -277,6 +289,7 @@ L.TileLayer.HeatCanvas = L.Class.extend({
 		});
 	},
 	
+	//Reset values used to calculate movement of map between last pan-events to get proper canvas position:
 	resetValues: function() {
 		this.deltax_px = 0;
 		this.deltay_px = 0;
@@ -284,6 +297,11 @@ L.TileLayer.HeatCanvas = L.Class.extend({
 		this.mapTopLeftLayerPoints_y_new = 0;
 		this.mapTopLeftLayerPoints_x_old = 0;
 		this.mapTopLeftLayerPoints_y_old = 0;
+	},
+	
+	//Set the interpolation method used to calculate interpolated values:
+	setIntMethod: function(interpolation_method) {
+		this.interpolation_method = interpolation_method;
 	}
 
 });

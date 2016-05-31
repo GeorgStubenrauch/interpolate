@@ -25,18 +25,12 @@
 	<script src="app/components/Canvas_Overlay/L.CanvasOverlay.js"></script>
 	<script src="app/components/Leaflet.EasyButton-master/src/easy-button.js"></script>
 	<script src="app/components/FileSaver.js-master/FileSaver.js"></script>
-	<!--<script src="app/components/kriging/kriging.js"></script>-->
 	
-	<!--Leaflet.heatcanvas inclusive Leaflet 0.7.7-->
-	<!--<script src="app/components/leaflet-0.7.7/leaflet.js"></script>-->
 	<script src="app/components/Leaflet.heatcanvas/heatcanvas.js"></script>
 	<script src="app/components/Leaflet.heatcanvas/heatcanvas-leaflet.js"></script>
 	<script src="app/components/Leaflet.heatcanvas/heatcanvas-worker.js"></script>
-	<!--Heatmap.js-->
-	<!--<script src="app/components/Leaflet.heatmap/leaflet-heatmap.js"></script>-->
 	
 	<link rel="stylesheet" href="app/components/leaflet/dist/leaflet.css" />
-	<!--<link rel="stylesheet" href="app/components/leaflet-0.7.7/leaflet.css" />-->
 	
 	<link rel="stylesheet" href="app/components/bootstrap/dist/css/bootstrap.min.css"/>
 	<link href="app/components/font-awesome/css/font-awesome.min.css" rel="stylesheet">
@@ -53,12 +47,11 @@
 	<script src="partials/controllers/registerController.js"></script>
 	<script src="partials/controllers/classController.js"></script>
 	<script src="partials/controllers/alertController.js"></script>
+	<script src="partials/controllers/interpolationController.js"></script>
 		
 	<link rel="stylesheet" href="partials/css/mod_leaflet-sidebar.min.css">
 	<link rel="stylesheet" href="partials/css/charts.css">
-	<link rel="stylesheet" href="app/components/Leaflet.ExtraMarkers/dist/css/leaflet.extra-markers.min.css">
-
-	
+	<link rel="stylesheet" href="app/components/Leaflet.ExtraMarkers/dist/css/leaflet.extra-markers.min.css">	
 	
   </head>
   
@@ -201,6 +194,31 @@
 		</div>
 		
 	</div>
-    <!--<p id="status"></p>  heatcanvas-->
+	
+	<!-- Interpolation box -->
+	<div class="modal-content loginPopup" ng-controller="interpolationCtrl" ng-show="choosingint">
+		
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click="close()"><i class="fa fa-times"></i></button>
+			<h4>Interpolationsmethode</h4>
+		</div>
+		<div class="modal-body">
+
+			<div class="form-group form-group" >
+				<label>
+					<input type="radio" ng-model="intmethod" value="Kriging">
+					Kriging
+				</label><br/>
+				<label>
+					<input type="radio" ng-model="intmethod" value="IDW">
+					IDW
+				</label><br/>
+			</div>
+			
+			<div class="modal-footer">
+				<div class="btn btn-primary"  ng-click="getIntMethod()">Auswahl</button></div>
+			</div>
+		</div>
+	</div>
   </body>
 </html>
