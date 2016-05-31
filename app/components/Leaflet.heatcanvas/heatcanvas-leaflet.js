@@ -30,6 +30,7 @@ known problems:
 - performance not that great since values are interpolated for all single cells
 - canvas is redrawn completely with every pan-event, e.g. change to only move canvas instead of redraw
 - deletion of values in data array caused problems, workaround used: deleted values changed to 999.0 and caught with if-clause, should be changed!
+- canvas sizes does not 100% fit marker cluster once panned (right, bottom a little smaller), needs to be fixed
 
 additional information:
 this library and the respective functions call functions from heatcanvas.js, contains different important methods, e.g. push, interpolate, ...
@@ -96,7 +97,7 @@ L.TileLayer.HeatCanvas = L.Class.extend({
         this._degree = options.degree || HeatCanvas.LINEAR;
         this._opacity = options.opacity || 0.6;
         this._colorscheme = options.colorscheme || null;
-		var bounds = this.markerCluster.getBounds();
+		var bounds = this.markerCluster.getBounds();	//MARKER CLUSTER IMPORTANT, NEEDED TO GET BOUNDS OF ALL MARKERS!
 		console.log("Bounds init: ",bounds);
         var container = L.DomUtil.create('div', 'leaflet-heatmap-container');
         container.style.position = 'absolute';
